@@ -451,6 +451,25 @@ namespace XS_Utils
             Init();
             corrutinaEstaticaMonoBehavior.StopCoroutine(coroutine);
         }
+
+
+        public static Coroutine While(Func<bool> sortida, Action update)
+        {
+            Init();
+            return corrutinaEstaticaMonoBehavior.StartCoroutine(WhileCorrutine(sortida, update));
+        }
+        static IEnumerator WhileCorrutine(Func<bool> sortida, Action update)
+        {
+            Debug.Log("ei");
+            while (!sortida.Invoke())
+            {
+                Debug.Log("oho");
+                update.Invoke();
+                yield return new WaitForEndOfFrame();
+            }
+            update.Invoke();
+            yield return null;
+        }
     }
 
     public static class LaMevaCamara
