@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c460ed18bf3761c4f96e170fff893524, type: 3}
   m_Name: Limitar FrameRate
   m_EditorClassIdentifier: 
-  frameRate: 20
+  frameRate: 50
