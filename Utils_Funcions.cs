@@ -270,6 +270,44 @@ namespace XS_Utils
             return controlTempsMonoBehavior.StartCoroutine(SetActivaCorrutine(gameObject, value, waitForSeconds));
         }
     }
+    public class CompteEnrere
+    {
+        readonly float temps;
+        readonly Action enFinalitzar;
+        bool comptant;
+        float tActual;
+        public bool TempsIgualA(float nouTemps) => temps.Equals(nouTemps);
+        public CompteEnrere(float temps, Action enFinalitzar)
+        {
+            comptant = false;
+            tActual = temps;
+            this.temps = temps;
+            this.enFinalitzar = enFinalitzar;
+        }
+
+        public void Iniciar()
+        {
+            comptant = true;
+            tActual = temps;
+        }
+        public void Actualitzar()
+        {
+            if (!comptant)
+                return;
+
+            tActual -= Time.unscaledDeltaTime;
+
+            if (tActual <= 0) 
+            {
+                enFinalitzar.Invoke();
+                comptant = false;
+            } 
+        }
+        public void Aturar()
+        {
+            comptant = false;
+        }
+    }
 
     public static class Corrutina
     {
