@@ -270,42 +270,74 @@ namespace XS_Utils
             return controlTempsMonoBehavior.StartCoroutine(SetActivaCorrutine(gameObject, value, waitForSeconds));
         }
     }
-    public class CompteEnrere
+
+    /// <summary>
+    /// Non-static class made to have a "time" with all possible functionalities.
+    /// It have to be initated with the builder, with a time and a funtions to call on end.
+    /// </summary>
+    public class Countdown
     {
-        readonly float temps;
-        readonly Action enFinalitzar;
-        bool comptant;
-        float tActual;
-        public bool TempsIgualA(float nouTemps) => temps.Equals(nouTemps);
-        public CompteEnrere(float temps, Action enFinalitzar)
+        float time;
+        Action onEnd;
+        bool active;
+        float currentTime;
+        bool Ended => currentTime <= 0;
+
+        public Countdown(float time, Action onEnd)
         {
-            comptant = false;
-            tActual = temps;
-            this.temps = temps;
-            this.enFinalitzar = enFinalitzar;
+            active = false;
+            SetCurrentTime(time);
+            this.time = time;
+            this.onEnd = onEnd;
         }
 
-        public void Iniciar()
+        /// <summary>
+        /// Sets the time if you want to set it after create it.
+        /// </summary>
+        void SetCurrentTime(float time)
         {
-            comptant = true;
-            tActual = temps;
+            currentTime = time;
         }
-        public void Actualitzar()
+
+
+        /// <summary>
+        /// Start the countdown
+        /// </summary>
+        public void Start()
         {
-            if (!comptant)
+            active = true;
+            SetCurrentTime(time);
+        }
+
+        /// <summary>
+        /// Activate the countdown without resestart the current time. 
+        /// </summary>
+        public void Continue()
+        {
+            active = true;
+        }
+        /// <summary>
+        /// It must to be called every frame on yout Update main class, to be sure the countdown start right after it activates.
+        /// </summary>
+        public void Update()
+        {
+            if (!active)
                 return;
 
-            tActual -= Time.unscaledDeltaTime;
+            currentTime -= Time.unscaledDeltaTime;
 
-            if (tActual <= 0) 
+            if (Ended) 
             {
-                enFinalitzar.Invoke();
-                comptant = false;
+                onEnd.Invoke();
+                active = false;
             } 
         }
-        public void Aturar()
+        /// <summary>
+        /// Stopts the countdown
+        /// </summary>
+        public void Stop(bool restart = false)
         {
-            comptant = false;
+            active = false;
         }
     }
 
