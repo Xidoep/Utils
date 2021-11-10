@@ -394,15 +394,19 @@ namespace XS_Utils
         }
     }
 
-    public static class LaMevaCamara
+    public static class MyCamera
     {
-        static Camera camara;
-        public static Camera Camara 
+        static Camera camera;
+        public static Camera CameraMain 
         {
-            set => camara = value;
-            get => camara;
+            set => camera = value;
+            get 
+            {
+                if (camera == null) camera = Camera.main;
+                return camera;
+            }
         }
-        public static Transform Transform => camara.transform;
+        public static Transform Transform => camera.transform;
     }
 
     public static class To
