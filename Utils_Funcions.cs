@@ -551,12 +551,12 @@ namespace XS_Utils
 
     //FALTA:
     //Colliders in sphere i box.
-    public static class Fisiques
+    public static class XS_Physics
     {
         static RaycastHit hit;
-
         static Collider[] results;
-        public static RaycastHit Raig(Vector3 origin, Vector3 direction, float distance, LayerMask layerMask, float temps = 0)
+
+        public static RaycastHit RayDebug(Vector3 origin, Vector3 direction, float distance, LayerMask layerMask, float temps = 0)
         {
             if (Physics.Raycast(origin, direction, out hit, distance, layerMask))
             {
@@ -568,7 +568,13 @@ namespace XS_Utils
             }
             return hit;
         }
-        public static RaycastHit RaigEsfera(Vector3 origin, Vector3 direction, float distance, LayerMask layerMask, float radius, float temps = 0)
+        public static RaycastHit Ray(Vector3 origin, Vector3 direction, float distance, LayerMask layerMask)
+        {
+            Physics.Raycast(origin, direction, out hit, distance, layerMask);
+            return hit;
+        }
+
+        public static RaycastHit RaySphereDebug(Vector3 origin, Vector3 direction, float distance, LayerMask layerMask, float radius, float temps = 0)
         {
             if(Physics.SphereCast(origin, radius,direction, out hit, distance, layerMask))
             {
@@ -580,14 +586,19 @@ namespace XS_Utils
             }
             return hit;
         }
-
-        public static bool Impactat(this RaycastHit raycastHit) => raycastHit.collider != null;
-
-        public static float RaigDistancia(Vector3 origin, Vector3 direction, float distance, LayerMask layerMask, float temps = 0)
+        public static RaycastHit RaySphere(Vector3 origin, Vector3 direction, float distance, LayerMask layerMask, float radius)
         {
-            if (Raig(origin,direction,distance,layerMask).Impactat())
+            Physics.SphereCast(origin, radius, direction, out hit, distance, layerMask);
+            return hit;
+        }
+
+        public static bool Hitted(this RaycastHit raycastHit) => raycastHit.collider != null;
+
+        public static float RayDistance(Vector3 origin, Vector3 direction, float distance, LayerMask layerMask, float temps = 0)
+        {
+            if (RayDebug(origin,direction,distance,layerMask).Hitted())
             {
-                return Vector3.Distance(origin, Raig(origin, direction, distance, layerMask).point);
+                return Vector3.Distance(origin, RayDebug(origin, direction, distance, layerMask).point);
             }
             else
             {
@@ -608,7 +619,7 @@ namespace XS_Utils
         }
     }
 
-    public static class Comparacions
+    public static class XS_Compare
     {
         /// <summary>
         /// Comprova si un float esta aprop d'un altre (dins un rang).
@@ -617,7 +628,7 @@ namespace XS_Utils
         /// <param name="altre"></param>
         /// <param name="rang"></param>
         /// <returns></returns>
-        public static bool EstaProxim(this float valor, float altre, float rang) => valor == Mathf.Clamp(valor, altre + rang, altre - rang);
+        public static bool IsNear(this float valor, float altre, float rang) => valor == Mathf.Clamp(valor, altre + rang, altre - rang);
     }
 
     public static class Web
