@@ -310,6 +310,15 @@ namespace XS_Utils
         }
 
         /// <summary>
+        /// Start the countdown setting the time before start.
+        /// </summary>
+        /// <param name="time"></param>
+        public void Start(float time)
+        {
+            this.time = time;
+            Start();
+        }
+        /// <summary>
         /// Activate the countdown without resestart the current time. 
         /// </summary>
         public void Continue()
