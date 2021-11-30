@@ -11,7 +11,9 @@ public class Volum : MonoBehaviour
     //PUBLIQUES
     [SerializeField] LayerMask capa;
     [SerializeField] [Range(1, 10)] float rang;
+    [SerializeField] float multiplicador;
     [SerializeField] UnityEvent<float> funcio;
+    [Header("Debug")]
     [SerializeField] Color color = Color.red;
 
     //PRIVADES
@@ -55,7 +57,7 @@ public class Volum : MonoBehaviour
         if(valor != Valor(colliders[0].transform))
         {
             valor = Valor(colliders[0].transform);
-            funcio.Invoke(Mathf.Clamp01(valor));
+            funcio.Invoke(Mathf.Clamp01(valor) * multiplicador);
         }
 
         Debug.DrawLine(colliders[0].transform.position, boxCollider.ClosestPoint(colliders[0].transform.position), new Color(valor,valor,valor,1));
