@@ -12,4 +12,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 748654b8d60921c48b402fbf4d8308b1, type: 3}
   m_Name: Settings
   m_EditorClassIdentifier: 
-  uiSize: 1.5
+  uiSize: 0.75

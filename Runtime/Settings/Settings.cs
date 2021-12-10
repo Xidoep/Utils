@@ -13,6 +13,8 @@ public class Settings : ScriptableObject
         uiSize = valor;
         enUiSize?.Invoke(uiSize);
     }
+    public float UISize_Get() => uiSize;
+
     public void UiSize_AddEvent(System.Action<float> action) => enUiSize += action;
     public void UiSize_AddAndInvokeEvent(System.Action<float> action) 
     {
