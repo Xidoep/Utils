@@ -27,5 +27,7 @@ public class Utils_EsdevenimentsPerTrigger : MonoBehaviour
             colliders = _tmp;
             onExit?.Invoke();
         }
+
+       
     }
 }

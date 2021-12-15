@@ -24,10 +24,40 @@ public class Settings : ScriptableObject
     public void UiSize_RemoveEvent(System.Action<float> action) => enUiSize -= action;
 
 
-
     private void OnValidate()
     {
+        tamanyInterficie?.Event_Invoke();
         enUiSize?.Invoke(uiSize);
     }
 
+
+    public Variable<float> tamanyInterficie;
+    public void TamanyInterficie_Set(float value) => tamanyInterficie.Value_Set(value);
+
+
+    [System.Serializable]
+    public class Variable<T>
+    {
+        public T value;
+        System.Action<T> onValueChange;
+
+        public void Value_Set(T value)
+        {
+            this.value = value;
+            onValueChange?.Invoke(this.value);
+        }
+        public T Value_Get() => value;
+
+
+
+        public void Event_Add(System.Action<T> action) => onValueChange += action;
+        public void Event_InvokeAndAdd(System.Action<T> action)
+        {
+            action?.Invoke(value);
+            Event_Add(action);
+        }
+        public void Event_Invoke() => onValueChange?.Invoke(value);
+        public void Event_Remove(System.Action<T> action) => onValueChange -= action;
+
+    }
 }

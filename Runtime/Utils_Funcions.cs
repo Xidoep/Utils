@@ -1,13 +1,10 @@
-using TMPro;
 using System;
 using System.Collections;
-using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.InputSystem;
-using UnityEngine.Networking;
 using System.Collections.Generic;
-using UnityEngine.Localization;
-using UnityEngine.ResourceManagement.AsyncOperations;
+using TMPro;
+using UnityEngine;
+using UnityEngine.Networking;
+using UnityEngine.Pool;
 
 namespace XS_Utils
 {
@@ -242,7 +239,7 @@ namespace XS_Utils
         public static LayerMask Everything => -1;
     }
 
-    public static class GameObjects
+    public static class XS_GameObject
     {
         #region SetActiva Utils
         class ControlTempsMonoBehavior : MonoBehaviour { }
@@ -266,10 +263,120 @@ namespace XS_Utils
         {
             Init();
             WaitForSecondsRealtime waitForSeconds = new WaitForSecondsRealtime(temps);
-            
             return controlTempsMonoBehavior.StartCoroutine(SetActivaCorrutine(gameObject, value, waitForSeconds));
         }
+
+
+        //Array based on prefab with pools of objects.
+        static Dictionary<GameObject, Pool> pools;
+        
+        /// <summary>
+        /// Create or pull from pool if exists.
+        /// </summary>
+        /// <param name="_original">Prefab to instantiate</param>
+        /// <returns>The instantiated or pooled object</returns>
+        public static GameObject Instantiate(this GameObject _original) => Instantiate(_original, null);
+        /// <summary>
+        /// Create or pull form pool if exists.
+        /// </summary>
+        /// <param name="_original">Prefab to instantiate</param>
+        /// <param name="_position">Function to positioning the object</param>
+        /// <returns>The instantiated or pooled object</returns>
+        public static GameObject Instantiate(this GameObject _original, Func<Vector3> _position) => Instantiate(_original, _position, null, null);
+        /// <summary>
+        /// Create or pull form pool if exists.
+        /// </summary>
+        /// <param name="_original">Prefab to instantiate</param>
+        /// <param name="_position">Function to positioning the object</param>
+        /// <param name="_rotation">Function to rotate the object</param>
+        /// <returns>The instantiated or pooled object</returns>
+        public static GameObject Instantiate(this GameObject _original, Func<Vector3> _position, Func<Quaternion> _rotation) => Instantiate(_original, _position, _rotation, null);
+        /// <summary>
+        /// Create or pull form pool if exists.
+        /// </summary>
+        /// <param name="_original">Prefab to instantiate</param>
+        /// <param name="_position">Function to positioning the object</param>
+        /// <param name="_rotation">Function to rotate the object</param>
+        /// <param name="parent">transform to parent the object</param>
+        /// <returns>The instantiated or pooled object</returns>
+        public static GameObject Instantiate(this GameObject _original, Func<Vector3> _position, Func<Quaternion> _rotation, Transform parent)
+        {
+            if (pools == null) pools = new Dictionary<GameObject, Pool>();
+            if (!pools.ContainsKey(_original)) pools.Add(_original, new Pool());
+            return pools[_original].Get(_original, _position, _rotation, parent).gameObject;
+        }
+
+
+
+        public class Pool
+        {
+            bool iniciat = false;
+            ObjectPool<GameObject> pool;
+
+            GameObject original;
+            GameObject tmp;
+
+            Func<Vector3> position;
+            Func<Quaternion> rotation;
+            Transform parent;
+            Vector3 Position
+            {
+                get
+                {
+                    if (position != null) return position.Invoke();
+                    else return Vector3.zero;
+                }
+            }
+            Quaternion Rotation
+            {
+                get
+                {
+                    if (rotation != null) return rotation.Invoke();
+                    else return Quaternion.identity;
+                }
+            }
+
+
+            public GameObject Get(GameObject _original, Func<Vector3> _position, Func<Quaternion> _rotation, Transform _parent)
+            {
+                if (!iniciat) Iniciar(_original, _position, _rotation, _parent);
+                return pool.Get();
+            }
+            void Iniciar(GameObject _original, Func<Vector3> _position, Func<Quaternion> _rotation, Transform _parent)
+            {
+                original = _original;
+                position = _position;
+                rotation = _rotation;
+                parent = _parent;
+                pool = new ObjectPool<GameObject>(Crear, OnPoolGet, OnPoolRelease);
+                iniciat = true;
+            }
+            GameObject Crear()
+            {
+                tmp = UnityEngine.Object.Instantiate(original);
+                tmp.AddComponent<PooledObject>().Iniciar(Release);
+                return tmp;
+            }
+            void OnPoolGet(GameObject _pooledObject)
+            {
+                _pooledObject.transform.position = Position;
+                _pooledObject.transform.rotation = Rotation;
+                _pooledObject.transform.SetParent(parent);
+                _pooledObject.gameObject.SetActive(true);
+            }
+            void OnPoolRelease(GameObject _pooledObject) => _pooledObject.gameObject.SetActive(false);
+            void Release(GameObject _pooledObject) => pool.Release(_pooledObject);
+        }
+
+        public class PooledObject : MonoBehaviour
+        {
+            Action<GameObject> enRelease;
+            public void Iniciar(Action<GameObject> enRelease) => this.enRelease = enRelease;
+            private void OnDisable() => enRelease.Invoke(gameObject);
+        }
+
     }
+
 
     /// <summary>
     /// Non-static class made to have a "time" with all possible functionalities.
