@@ -5,35 +5,16 @@ using UnityEngine;
 [CreateAssetMenu(menuName = "XS/Utils/Settings", fileName = "Settings")]
 public class Settings : ScriptableObject
 {
-
-    /*[SerializeField] [Range(0.75f, 1.5f)] float uiSize  = 1;
-System.Action<float> enUiSize;
-
-public void UiSize_Set(float valor)
-{
-uiSize = valor;
-enUiSize?.Invoke(uiSize);
-}
-public float UISize_Get() => uiSize;
-
-public void UiSize_AddEvent(System.Action<float> action) => enUiSize += action;
-public void UiSize_AddAndInvokeEvent(System.Action<float> action) 
-{
-action.Invoke(uiSize);
-UiSize_AddEvent(action);
-} 
-public void UiSize_RemoveEvent(System.Action<float> action) => enUiSize -= action;
-
-
-private void OnValidate()
-{
-tamanyInterficie?.Event_Invoke();
-enUiSize?.Invoke(uiSize);
-}
-
-*/
     public Variable<float> interfaceSize; //1
-     [Tooltip("Entre: 0.75f i 1.5f")]public void InterfaceSize(float value) => interfaceSize.Set(value);
+    [Tooltip("Entre: 0.75f i 1.5f")]public void InterfaceSize(float value) => interfaceSize.Set(value);
+
+
+
+    private void OnValidate()
+    {
+        interfaceSize.Event_Invoke();
+    }
+
 
 
     [System.Serializable]

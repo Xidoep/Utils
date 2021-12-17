@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Settings
   m_EditorClassIdentifier: 
   interfaceSize:
-    value: 1.2
+    value: 1
