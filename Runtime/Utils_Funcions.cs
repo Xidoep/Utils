@@ -457,7 +457,7 @@ namespace XS_Utils
         }
     }
 
-    public static class Corrutina
+    public static class XS_Coroutine
     {
         class CorrutinaEstaticaMonoBehavior : MonoBehaviour { }
         static CorrutinaEstaticaMonoBehavior corrutinaEstaticaMonoBehavior;
@@ -491,22 +491,30 @@ namespace XS_Utils
         }
 
 
-        public static Coroutine While(Func<bool> sortida, Action update)
+        static IEnumerator Loop(Func<bool> sortida, Action update)
         {
-            Init();
-            return corrutinaEstaticaMonoBehavior.StartCoroutine(WhileCorrutine(sortida, update));
-        }
-        static IEnumerator WhileCorrutine(Func<bool> sortida, Action update)
-        {
-            Debug.Log("ei");
             while (!sortida.Invoke())
             {
-                Debug.Log("oho");
                 update.Invoke();
                 yield return new WaitForEndOfFrame();
             }
-            update.Invoke();
             yield return null;
+        }
+        public static Coroutine StartLoop(Action update)
+        {
+            Init();
+            return corrutinaEstaticaMonoBehavior.StartCoroutine(Loop(InfiniteLoop, update));
+        }
+        static bool InfiniteLoop() => false;
+
+        public static void StopLoop(this Coroutine coroutine, bool destroyCoroutine = true)
+        {
+            if (coroutine == null)
+                return;
+
+            corrutinaEstaticaMonoBehavior.StopCoroutine(coroutine);
+
+            if (destroyCoroutine) coroutine = null;
         }
     }
 
