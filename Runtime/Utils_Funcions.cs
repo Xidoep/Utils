@@ -469,29 +469,32 @@ namespace XS_Utils
                 corrutinaEstaticaMonoBehavior = gameObject.AddComponent<CorrutinaEstaticaMonoBehavior>();
             }
         }
+        static WaitForSecondsRealtime waitForSecondsRealtime;
 
-        public static Coroutine Iniciar(float temps, Action action)
+
+
+
+
+        public static Coroutine StartCoroutine(Action update)
         {
             Init();
-            WaitForSecondsRealtime waitForSeconds = new WaitForSecondsRealtime(temps);
-
-            return corrutinaEstaticaMonoBehavior.StartCoroutine(FuncioFinalCorrutine(action, waitForSeconds));
+            return corrutinaEstaticaMonoBehavior.StartCoroutine(LoopCondition(InfiniteLoop, update));
         }
-
-        static IEnumerator FuncioFinalCorrutine(Action action, WaitForSecondsRealtime waitForSeconds)
-        {
-            yield return waitForSeconds;
-            action.Invoke();
-        }
-
-        public static void Aturar(this Coroutine coroutine)
+        public static Coroutine StartCoroutine(Func<bool> sortida, Action update)
         {
             Init();
-            corrutinaEstaticaMonoBehavior.StopCoroutine(coroutine);
+            return corrutinaEstaticaMonoBehavior.StartCoroutine(LoopCondition(sortida, update));
+        }
+        public static Coroutine StartCoroutine(float time, Action ending)
+        {
+            Init();
+            waitForSecondsRealtime = new WaitForSecondsRealtime(time);
+            return corrutinaEstaticaMonoBehavior.StartCoroutine(LoopTime(ending));
         }
 
 
-        static IEnumerator Loop(Func<bool> sortida, Action update)
+
+        static IEnumerator LoopCondition(Func<bool> sortida, Action update)
         {
             while (!sortida.Invoke())
             {
@@ -500,14 +503,15 @@ namespace XS_Utils
             }
             yield return null;
         }
-        public static Coroutine StartLoop(Action update)
+        static IEnumerator LoopTime(Action ending)
         {
-            Init();
-            return corrutinaEstaticaMonoBehavior.StartCoroutine(Loop(InfiniteLoop, update));
+            yield return waitForSecondsRealtime;
+            ending.Invoke();
         }
-        static bool InfiniteLoop() => false;
 
-        public static void StopLoop(this Coroutine coroutine, bool destroyCoroutine = true)
+
+
+        public static void StopCoroutine(this Coroutine coroutine, bool destroyCoroutine = true)
         {
             if (coroutine == null)
                 return;
@@ -516,6 +520,8 @@ namespace XS_Utils
 
             if (destroyCoroutine) coroutine = null;
         }
+
+        static bool InfiniteLoop() => false;
     }
 
     public static class MyCamera
