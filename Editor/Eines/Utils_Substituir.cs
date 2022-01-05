@@ -59,7 +59,7 @@ public class Utils_Substituir : EditorWindow
             {
 
                 GameObject obj = (GameObject)PrefabUtility.InstantiatePrefab(nouObjecte);
-                obj.transform.Igualar(elementsASubstitur[i].transform);
+                obj.transform.Equalize(elementsASubstitur[i].transform);
                 Undo.RegisterCreatedObjectUndo(obj, "crear susititucions");
             }
 

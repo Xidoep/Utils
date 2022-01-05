@@ -21,6 +21,6 @@ public class Utils_MirarCamara : MonoBehaviour
 
     void Update()
     {
-        transform.MirarACamara(cam.gameObject);
+        transform.LookAtTarget(cam.gameObject);
     }
 }

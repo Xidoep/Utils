@@ -5,17 +5,40 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Pool;
+using UnityEngine.InputSystem;
 
 namespace XS_Utils
 {
+    namespace XS_Singleton
+    {
+        public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
+        {
+            public static T Instance { get; private set; }
+            protected virtual void Awake() => Instance = this as T;
+
+            protected virtual void OnApplicationQuit()
+            {
+                Instance = null;
+                Destroy(gameObject);
+            }
+        }
+        public abstract class SingletonDontDestroyOnLoad<T> : Singleton<T> where T : MonoBehaviour
+        {
+            protected override void Awake()
+            {
+                if (Instance != null) Destroy(gameObject);
+                DontDestroyOnLoad(gameObject);
+                base.Awake();
+            }
+        }
+    }
+   
+
     public static class Instanciar
     {
         /// <summary>
         /// Crea una primitica Esfera
         /// </summary>
-        /// <param name="transform"></param>
-        /// <param name="temps"></param>
-        /// <returns></returns>
         public static GameObject Sphere(Transform transform, float temps = 0) => Sphere(transform, transform.localPosition, transform.localEulerAngles, Vector3.one, temps);
         public static GameObject Sphere(Vector3 localPosition, Vector3 localRotation, float temps = 0) => Sphere(null, localPosition, localRotation, Vector3.one, temps);
         public static GameObject Sphere(Transform parent, Vector3 localPosition, Vector3 localRotation, Vector3 localScale, float temps = 0)
@@ -29,12 +52,7 @@ namespace XS_Utils
         /// <summary>
         /// Crea una primitiva Quad
         /// </summary>
-        /// <param name="parent"></param>
-        /// <param name="localPosition"></param>
-        /// <param name="localRotation"></param>
-        /// <param name="localScale"></param>
-        /// <param name="temps"></param>
-        /// <returns></returns>
+
         public static GameObject Quad(Transform parent, Vector3 localPosition, Vector3 localRotation, Vector3 localScale, float temps = 0)
         {
             GameObject _tmp = GameObject.CreatePrimitive(PrimitiveType.Quad);
@@ -46,13 +64,6 @@ namespace XS_Utils
         /// <summary>
         /// Crea textMesh 
         /// </summary>
-        /// <param name="texte"></param>
-        /// <param name="parent"></param>
-        /// <param name="localPosition"></param>
-        /// <param name="localRotation"></param>
-        /// <param name="localScale"></param>
-        /// <param name="temps"></param>
-        /// <returns></returns>
         public static TextMesh Texte(string texte, Transform parent, Vector3 localPosition, Vector3 localRotation, Vector3 localScale, float temps = 0)
         {
             TextMesh textMesh = new GameObject(texte, new System.Type[] { typeof(TextMesh) }).transform.SetTransform(parent, localPosition, localRotation, localScale).GetComponent<TextMesh>();
@@ -64,14 +75,10 @@ namespace XS_Utils
         /// <summary>
         /// Crea texte flotant que dura x segons
         /// </summary>
-        /// <param name="texte"></param>
-        /// <param name="parent"></param>
-        /// <param name="localPosition"></param>
-        /// <returns></returns>
         public static TextMeshPro TexteFlotant(string texte, Transform parent, Vector3 localPosition)
         {
             TextMeshPro textMeshPro = new GameObject(texte, new System.Type[] { typeof(TextMeshPro) }).GetComponent<TextMeshPro>();
-            textMeshPro.transform.SetTransform(parent, localPosition, Direccio.ACamara(), Vector3.one);
+            textMeshPro.transform.SetTransform(parent, localPosition, XS_Direction.ACamara(), Vector3.one);
             textMeshPro.text = texte;
             textMeshPro.alignment = TextAlignmentOptions.Center;
             return textMeshPro;
@@ -84,17 +91,12 @@ namespace XS_Utils
         }
     }
 
-    public static class Transformacions
+    public static class XS_Transform
     {
         /// <summary>
-        /// Posiciona un transform a una posicio, rotacio, escalat i parent.
+        /// Setup the transform with given information.
+        /// It's useful when you want to position a transform like when you Instantiate it, but you can't do it directly.
         /// </summary>
-        /// <param name="transform"></param>
-        /// <param name="parent"></param>
-        /// <param name="localPosition"></param>
-        /// <param name="localEulerAngles"></param>
-        /// <param name="localScale"></param>
-        /// <returns></returns>
         public static Transform SetTransform(this Transform transform, Transform parent, Vector3 localPosition, Vector3 localEulerAngles, Vector3 localScale)
         {
             transform.SetParent(parent);
@@ -107,60 +109,110 @@ namespace XS_Utils
         /// <summary>
         /// Iguala la posicio, rot, escalat d'un transform a un altre.
         /// </summary>
-        /// <param name="transform"></param>
-        /// <param name="altre"></param>
-        /// <returns></returns>
-        public static Transform Igualar(this Transform transform, Transform altre)
+        public static Transform Equalize(this Transform transform, Transform other)
         {
-            return transform.SetTransform(altre.parent, altre.localPosition, altre.localEulerAngles, altre.localScale);
+            return transform.SetTransform(other.parent, other.localPosition, other.localEulerAngles, other.localScale);
         }
     }
 
-    public static class Moviment
+
+    public static class XS_Movement
     {
-        public static void MovimentDireccio(this Transform transform, Vector3 direccio, float velocitat) => transform.localPosition += direccio * velocitat;
-        public static void MovimentDireccioRelativa(this Transform transform, Vector3 direccio, float velocitat) => transform.localPosition += transform.GetDireccioRelativa(direccio) * velocitat;
-        public static void MovimentObjectiu(this Transform transform, Transform objectiu, float velocitat) => transform.localPosition += transform.GetDireccioObjectiu(objectiu) * velocitat;
+        /// <summary>
+        /// Move the given transform to an absolute direction
+        /// </summary>
+        public static void MoveToDirection(this Transform transform, Vector3 direction, float speed) => transform.localPosition += direction * speed;
+
+        /// <summary>
+        /// Move the given transform to an direction, relative to actual heading of the object.
+        /// </summary>
+        public static void MoveToRelativeDirection(this Transform transform, Vector3 direction, float speed) => transform.localPosition += transform.GetRelativeDirection(direction) * speed;
+
+        /// <summary>
+        /// Move the given transform to a target on the world.
+        /// </summary>
+        public static void MoveToTarget(this Transform transform, Transform objectiu, float speed) => transform.localPosition += transform.GetTargetDirection(objectiu) * speed;
     }
 
-    public static class Orientacio
+    public static class XS_Rotation
     {
-        public static void MirarACamara(this Transform transform) => transform.forward = Direccio.ACamara();
-        public static void MirarACamara(this Transform transform, GameObject camara) => transform.forward = Direccio.ACamara(camara);
+        /// <summary>
+        /// It heads the forward axis of the given transform to the main camera.
+        /// </summary>
+        public static void LookAtCameraMain(this Transform transform) => transform.forward = XS_Direction.ACamara();
 
-        public static void MirarDireccio(this Transform transform, Vector3 direccio, Vector3 transformForward, float velocitat = 1) => transform.forward = Vector3.RotateTowards(transformForward, direccio.normalized, velocitat * Time.deltaTime, velocitat * Time.deltaTime);
-        public static void MirarDireccioRelativa(this Transform transform, Vector3 direccio, Vector3 transformForward, float velocitat = 1, bool debug = false) => transform.forward = Vector3.RotateTowards(transformForward, transform.GetDireccioRelativa(direccio, debug), velocitat * Time.deltaTime, velocitat * Time.deltaTime);
-        public static void MirarObjectiu(this Transform transform, Transform objectiu, Vector3 transformForward, float velocitat = 1, bool debug = false) => transform.forward = Vector3.RotateTowards(transformForward, transform.GetDireccioObjectiu(objectiu, debug), velocitat * Time.deltaTime, velocitat * Time.deltaTime);
-        public static void MirarObjectiu(this Transform transform, Quaternion rotacio, float velocitat = 1) => transform.rotation = Quaternion.RotateTowards(transform.rotation, rotacio, velocitat);
+        /// <summary>
+        /// It heads the forward axis of the given transform to the given gameObject.
+        /// </summary>
+        public static void LookAtTarget(this Transform transform, GameObject target) => transform.forward = XS_Direction.ACamara(target);
+
+        /// <summary>
+        /// Next 6 functions head the corresponding axis of the given transform to the given direction.
+        /// </summary>
+        public static void LookForwardAtDirection(this Transform transform, Vector3 direction) => transform.forward = direction.normalized;
+        public static void LookBackwardAtDirection(this Transform transform, Vector3 direction) => transform.forward = -direction.normalized;
+        public static void LookRightAtDirection(this Transform transform, Vector3 direction) => transform.right = direction.normalized;
+        public static void LookLeftAtDirection(this Transform transform, Vector3 direction) => transform.right = -direction.normalized;
+        public static void LookUpAtDirection(this Transform transform, Vector3 direction) => transform.up = direction.normalized;
+        public static void LookDownAtDirection(this Transform transform, Vector3 direction) => transform.up = -direction.normalized;
+
+        /// <summary>
+        /// It heads the given transform smoothly to the given direction.
+        /// </summary>
+        public static void LookAtDirectionSmooth(this Transform transform, Vector3 directio, Vector3 head, float speed = 1) => transform.forward = Vector3.RotateTowards(head, directio.normalized, speed * Time.deltaTime, speed * Time.deltaTime);
+        
+        /// <summary>
+        /// It heads the given transform smoothly to the given direction relative to the actual rotation of the transform.
+        /// </summary>
+        public static void LookAtRelativeDirectionSmooth(this Transform transform, Vector3 direccio, Vector3 head, float speed = 1, bool debug = false) => transform.forward = Vector3.RotateTowards(head, transform.GetRelativeDirection(direccio), speed * Time.deltaTime, speed * Time.deltaTime);
+        
+        /// <summary>
+        /// It heads the given transform smoothly to a given target.
+        /// </summary>
+        public static void TookAtTargetSmooth(this Transform transform, Transform target, Vector3 head, float speed = 1, bool debug = false) => transform.forward = Vector3.RotateTowards(head, transform.GetTargetDirection(target), speed * Time.deltaTime, speed * Time.deltaTime);
+        
+        /// <summary>
+        /// It smoothly rotates the given transform to math the given rotation
+        /// </summary>
+        public static void RotateToQuaternionSmooth(this Transform transform, Quaternion rotation, float speed = 1) => transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, speed);
     }
 
-    public static class Direccio
+    public static class XS_Direction
     {
-        public static Vector3 GetDireccioRelativa(this Transform transform, Vector3 direccio, bool debug = false)
+        /// <summary>
+        /// It gets the direction to a given direction relative to the given transform.
+        /// Transform it to a Quaternion using ToQuaternion() function.
+        /// </summary>
+        public static Vector3 GetRelativeDirection(this Transform transform, Vector3 direccio) => (transform.right * direccio.x + transform.up * direccio.y + transform.forward * direccio.z).normalized;
+        public static Vector3 GetRelativeDirection_Debug(this Transform transform, Vector3 direccio)
         {
-            if (debug) Debugar.DrawRay(transform.position, (transform.right * direccio.x + transform.up * direccio.y + transform.forward * direccio.z).normalized, Color.red);
-            return (transform.right * direccio.x + transform.up * direccio.y + transform.forward * direccio.z).normalized;
+            Debugar.DrawRay(transform.position, (transform.right * direccio.x + transform.up * direccio.y + transform.forward * direccio.z).normalized, Color.red);
+            return transform.GetRelativeDirection(direccio);
         }
-        public static Quaternion GetDireccioRelativaToQuaterinon(this Transform transform, Vector3 direccio, bool debug = false) => GetDireccioRelativa(transform, direccio, debug).ToQuaternion();
 
-        public static Vector3 GetDireccioObjectiu(this Transform transform, Transform objectiu, bool debug = false)
+
+        /// <summary>
+        /// It gets the direction to a given target.
+        /// Transform it to a Quaternion using ToQuaternion() function.
+        /// </summary>
+        public static Vector3 GetTargetDirection(this Transform transform, Transform target) => (target.position - transform.position).normalized;
+        public static Vector3 GetTargetDirection_Debug(this Transform transform, Transform target)
         {
-            if (debug) Debugar.DrawRay(transform.position, (objectiu.position - transform.position).normalized, Color.red);
-            return (objectiu.position - transform.position).normalized;
+            Debugar.DrawRay(transform.position, (target.position - transform.position).normalized, Color.red);
+            return transform.GetTargetDirection(target);
         }
-        public static Quaternion GetDireccioObjectiuToQuaternion(this Transform transform, Transform objectiu, bool debug = false) => GetDireccioObjectiu(transform, objectiu, debug).ToQuaternion();
 
-        public static Vector3 GetDireccio(this Transform transform, Vector3 direccio, float quantitat, bool debug = false)
+
+        public static Vector3 GetDirectionSmooth(this Transform transform, Vector3 direccio, float quantitat) => Vector3.RotateTowards(transform.forward, direccio.normalized, quantitat * Time.deltaTime, quantitat * Time.deltaTime);
+        public static Vector3 GetDirectionSmooth_Debug(this Transform transform, Vector3 direccio, float quantitat)
         {
-            if (debug)
-            {
-                Debugar.DrawRay(transform.position, direccio);
-                Debugar.DrawRay(transform.position, Vector3.RotateTowards(transform.forward, direccio.normalized, quantitat * Time.deltaTime, quantitat * Time.deltaTime));
-            }
+            Debugar.DrawRay(transform.position, direccio);
+            Debugar.DrawRay(transform.position, Vector3.RotateTowards(transform.forward, direccio.normalized, quantitat * Time.deltaTime, quantitat * Time.deltaTime));
+
             return Vector3.RotateTowards(transform.forward, direccio.normalized, quantitat * Time.deltaTime, quantitat * Time.deltaTime);
         }
-        public static Quaternion GetDireccioToQuaternion(this Transform transform, Vector3 direccio, float quantitat, bool debug = false) => transform.GetDireccio(direccio, quantitat, debug).ToQuaternion();
 
+        //Canviar, no es a camara, es a un objecte qualsevol.
         public static Vector3 ACamara(GameObject camara) => camara.transform.forward;
 
         public static Vector3 ACamara()
@@ -192,8 +244,13 @@ namespace XS_Utils
         }
     }
 
-    public static class Inputs
+    public static class XS_Input
     {
+        /// <summary>
+        /// Is listening the given key of the InputSystem and returns TRUE at the frame it is pressed. Otherwise it returns FALSE.
+        /// It needs "using UnityEngine.InputSystem;" to refere to Key.
+        /// </summary>
+        public static bool OnPress(this Key key) => Keyboard.current[key].wasPressedThisFrame;
     }
 
     public static class Mouse
@@ -241,12 +298,12 @@ namespace XS_Utils
 
     public static class XS_GameObject
     {
-        #region SetActiva Utils
+        #region SetActive Tools
         class ControlTempsMonoBehavior : MonoBehaviour { }
         static ControlTempsMonoBehavior controlTempsMonoBehavior;
         static void Init()
         {
-            if(controlTempsMonoBehavior == null)
+            if (controlTempsMonoBehavior == null)
             {
                 GameObject gameObject = new GameObject("ControlTempsMonoBehavior");
                 controlTempsMonoBehavior = gameObject.AddComponent<ControlTempsMonoBehavior>();
@@ -265,52 +322,21 @@ namespace XS_Utils
             WaitForSecondsRealtime waitForSeconds = new WaitForSecondsRealtime(temps);
             return controlTempsMonoBehavior.StartCoroutine(SetActivaCorrutine(gameObject, value, waitForSeconds));
         }
+    }
 
-
-        //Array based on prefab with pools of objects.
+    public static class XS_Instantiate
+    {
+        /// <summary>
+        /// Instantiate objects using the Pooling system
+        /// </summary>
+        #region Instantiate Tools
+        //When an object is instantiated and item of the dictionary is created, with the Prefab as key and the Pool used for this prefab.
+        //If the dictionary already contains de prefab we want to create, it takes the Pool refered instead of creating a new one
         static Dictionary<GameObject, Pool> pools;
-        
-        /// <summary>
-        /// Create or pull from pool if exists.
-        /// </summary>
-        /// <param name="_original">Prefab to instantiate</param>
-        /// <returns>The instantiated or pooled object</returns>
-        public static GameObject Instantiate(this GameObject _original) => Instantiate(_original, null);
-        /// <summary>
-        /// Create or pull form pool if exists.
-        /// </summary>
-        /// <param name="_original">Prefab to instantiate</param>
-        /// <param name="_position">Function to positioning the object</param>
-        /// <returns>The instantiated or pooled object</returns>
-        public static GameObject Instantiate(this GameObject _original, Func<Vector3> _position) => Instantiate(_original, _position, null, null);
-        /// <summary>
-        /// Create or pull form pool if exists.
-        /// </summary>
-        /// <param name="_original">Prefab to instantiate</param>
-        /// <param name="_position">Function to positioning the object</param>
-        /// <param name="_rotation">Function to rotate the object</param>
-        /// <returns>The instantiated or pooled object</returns>
-        public static GameObject Instantiate(this GameObject _original, Func<Vector3> _position, Func<Quaternion> _rotation) => Instantiate(_original, _position, _rotation, null);
-        /// <summary>
-        /// Create or pull form pool if exists.
-        /// </summary>
-        /// <param name="_original">Prefab to instantiate</param>
-        /// <param name="_position">Function to positioning the object</param>
-        /// <param name="_rotation">Function to rotate the object</param>
-        /// <param name="parent">transform to parent the object</param>
-        /// <returns>The instantiated or pooled object</returns>
-        public static GameObject Instantiate(this GameObject _original, Func<Vector3> _position, Func<Quaternion> _rotation, Transform parent)
-        {
-            if (pools == null) pools = new Dictionary<GameObject, Pool>();
-            if (!pools.ContainsKey(_original)) pools.Add(_original, new Pool());
-            return pools[_original].Get(_original, _position, _rotation, parent).gameObject;
-        }
-
-
 
         public class Pool
         {
-            bool iniciat = false;
+            bool initializated = false;
             ObjectPool<GameObject> pool;
 
             GameObject original;
@@ -319,6 +345,7 @@ namespace XS_Utils
             Func<Vector3> position;
             Func<Quaternion> rotation;
             Transform parent;
+
             Vector3 Position
             {
                 get
@@ -336,27 +363,46 @@ namespace XS_Utils
                 }
             }
 
-
-            public GameObject Get(GameObject _original, Func<Vector3> _position, Func<Quaternion> _rotation, Transform _parent)
-            {
-                if (!iniciat) Iniciar(_original, _position, _rotation, _parent);
-                return pool.Get();
-            }
-            void Iniciar(GameObject _original, Func<Vector3> _position, Func<Quaternion> _rotation, Transform _parent)
+            /// <summary>
+            /// It creates the Pool passing the functions needed to polled from pool.
+            /// It is called ones when we try to instantiate the object of first time. 
+            /// One the Pool is created is sets "initializated" to TRUE to prevent to call it multiple times.
+            /// </summary>
+            void Initialize(GameObject _original, Func<Vector3> _position, Func<Quaternion> _rotation, Transform _parent)
             {
                 original = _original;
                 position = _position;
                 rotation = _rotation;
                 parent = _parent;
                 pool = new ObjectPool<GameObject>(Crear, OnPoolGet, OnPoolRelease);
-                iniciat = true;
+                initializated = true;
             }
+            /// <summary>
+            /// It's the main function to pull (or create) objects from Pool.
+            /// It calls Initialize if it needs to don't care do it form outside.
+            /// </summary>
+            public GameObject Get(GameObject _original, Func<Vector3> _position, Func<Quaternion> _rotation, Transform _parent)
+            {
+                if (!initializated) Initialize(_original, _position, _rotation, _parent);
+                return pool.Get();
+            }
+
+            /// <summary>
+            /// It's responsable to actually "Create" the object in the scene.
+            /// It is just actually called when the Pool is empty and needs to add more objects in the scene.
+            /// When there are objects in the scene the system doesn't use this functions, just sets active them.
+            /// It also adds a script to the gameobject that calls the function OnPoolRelease then gameobject sets inactive.
+            /// </summary>
             GameObject Crear()
             {
                 tmp = UnityEngine.Object.Instantiate(original);
                 tmp.AddComponent<PooledObject>().Iniciar(Release);
                 return tmp;
             }
+
+            /// <summary>
+            /// This is called when an object is pulled form the Pool whenever is created or set actived.
+            /// </summary>
             void OnPoolGet(GameObject _pooledObject)
             {
                 _pooledObject.transform.position = Position;
@@ -364,16 +410,45 @@ namespace XS_Utils
                 _pooledObject.transform.SetParent(parent);
                 _pooledObject.gameObject.SetActive(true);
             }
+
+            /// <summary>
+            /// This is called when and object of the Pool is release. It means that it can be Pulled again.
+            /// I just set the gameobject inactive. I don't know if I actually using it, but the Pooling system ask me for it.
+            /// </summary>
             void OnPoolRelease(GameObject _pooledObject) => _pooledObject.gameObject.SetActive(false);
+
+            /// <summary>
+            /// It releases the object to be able to be pulled again.
+            /// It is called from the PooledObject scripts when the gameobjects gets disabled.
+            /// </summary>
             void Release(GameObject _pooledObject) => pool.Release(_pooledObject);
         }
 
+
+        /// <summary>
+        /// The script added to all pulled objects. I just release the gameobject when it gets disabled to be able to be pulled again.
+        /// </summary>
         public class PooledObject : MonoBehaviour
         {
             Action<GameObject> enRelease;
             public void Iniciar(Action<GameObject> enRelease) => this.enRelease = enRelease;
             private void OnDisable() => enRelease.Invoke(gameObject);
         }
+        #endregion
+
+
+
+        public static GameObject Instantiate(this GameObject original) => Instantiate(original, null, null, null);
+        public static GameObject Instantiate(this GameObject original, Func<Vector3> position) => original.Instantiate(position, null, null);
+        public static GameObject Instantiate(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation) => original.Instantiate(position, rotation, null);
+        public static GameObject Instantiate(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation, Transform parent)
+        {
+            if (pools == null) pools = new Dictionary<GameObject, Pool>();
+            if (!pools.ContainsKey(original)) pools.Add(original, new Pool());
+            return pools[original].Get(original, position, rotation, parent).gameObject;
+        }
+
+
 
     }
 
