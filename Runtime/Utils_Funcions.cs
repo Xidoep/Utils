@@ -126,12 +126,12 @@ namespace XS_Utils
         /// <summary>
         /// Move the given transform to an direction, relative to actual heading of the object.
         /// </summary>
-        public static void MoveToRelativeDirection(this Transform transform, Vector3 direction, float speed) => transform.localPosition += transform.GetRelativeDirection(direction) * speed;
+        public static void MoveToRelativeDirection(this Transform transform, Vector3 direction, float speed) => transform.localPosition += transform.GetDirectionRelative(direction) * speed;
 
         /// <summary>
         /// Move the given transform to a target on the world.
         /// </summary>
-        public static void MoveToTarget(this Transform transform, Transform objectiu, float speed) => transform.localPosition += transform.GetTargetDirection(objectiu) * speed;
+        public static void MoveToTarget(this Transform transform, Transform objectiu, float speed) => transform.localPosition += transform.GetDirectionToTarget(objectiu) * speed;
     }
 
     public static class XS_Rotation
@@ -164,12 +164,12 @@ namespace XS_Utils
         /// <summary>
         /// It heads the given transform smoothly to the given direction relative to the actual rotation of the transform.
         /// </summary>
-        public static void LookAtRelativeDirectionSmooth(this Transform transform, Vector3 direccio, Vector3 head, float speed = 1, bool debug = false) => transform.forward = Vector3.RotateTowards(head, transform.GetRelativeDirection(direccio), speed * Time.deltaTime, speed * Time.deltaTime);
+        public static void LookAtRelativeDirectionSmooth(this Transform transform, Vector3 direccio, Vector3 head, float speed = 1, bool debug = false) => transform.forward = Vector3.RotateTowards(head, transform.GetDirectionRelative(direccio), speed * Time.deltaTime, speed * Time.deltaTime);
         
         /// <summary>
         /// It heads the given transform smoothly to a given target.
         /// </summary>
-        public static void TookAtTargetSmooth(this Transform transform, Transform target, Vector3 head, float speed = 1, bool debug = false) => transform.forward = Vector3.RotateTowards(head, transform.GetTargetDirection(target), speed * Time.deltaTime, speed * Time.deltaTime);
+        public static void TookAtTargetSmooth(this Transform transform, Transform target, Vector3 head, float speed = 1, bool debug = false) => transform.forward = Vector3.RotateTowards(head, transform.GetDirectionToTarget(target), speed * Time.deltaTime, speed * Time.deltaTime);
         
         /// <summary>
         /// It smoothly rotates the given transform to math the given rotation
@@ -183,33 +183,46 @@ namespace XS_Utils
         /// It gets the direction to a given direction relative to the given transform.
         /// Transform it to a Quaternion using ToQuaternion() function.
         /// </summary>
-        public static Vector3 GetRelativeDirection(this Transform transform, Vector3 direccio) => (transform.right * direccio.x + transform.up * direccio.y + transform.forward * direccio.z).normalized;
-        public static Vector3 GetRelativeDirection_Debug(this Transform transform, Vector3 direccio)
+        public static Vector3 GetDirectionRelative(this Transform transform, Vector3 relativeDirection) => (transform.right * relativeDirection.x + transform.up * relativeDirection.y + transform.forward * relativeDirection.z).normalized;
+        public static Vector3 GetDirectionRelative_Debug(this Transform transform, Vector3 relativeDirection)
         {
-            Debugar.DrawRay(transform.position, (transform.right * direccio.x + transform.up * direccio.y + transform.forward * direccio.z).normalized, Color.red);
-            return transform.GetRelativeDirection(direccio);
+            Debugar.DrawRay(transform.position, (transform.right * relativeDirection.x + transform.up * relativeDirection.y + transform.forward * relativeDirection.z).normalized, Color.red);
+            return transform.GetDirectionRelative(relativeDirection);
         }
 
 
         /// <summary>
-        /// It gets the direction to a given target.
-        /// Transform it to a Quaternion using ToQuaternion() function.
+        /// It gets the normalized direction to a given target.
+        /// If you need it you can transform it to a Quaternion using ToQuaternion().
         /// </summary>
-        public static Vector3 GetTargetDirection(this Transform transform, Transform target) => (target.position - transform.position).normalized;
-        public static Vector3 GetTargetDirection_Debug(this Transform transform, Transform target)
+        public static Vector3 GetDirectionToTarget(this Transform transform, Transform target) => (target.position - transform.position).normalized;
+        public static Vector3 GetDirectionToTarget_Debug(this Transform transform, Transform target)
         {
             Debugar.DrawRay(transform.position, (target.position - transform.position).normalized, Color.red);
-            return transform.GetTargetDirection(target);
+            return transform.GetDirectionToTarget(target);
         }
 
-
-        public static Vector3 GetDirectionSmooth(this Transform transform, Vector3 direccio, float quantitat) => Vector3.RotateTowards(transform.forward, direccio.normalized, quantitat * Time.deltaTime, quantitat * Time.deltaTime);
-        public static Vector3 GetDirectionSmooth_Debug(this Transform transform, Vector3 direccio, float quantitat)
+        /// <summary>
+        /// Gets the direction to a target smoothly.
+        /// </summary>
+        public static Vector3 GetDirectionToTargetSmooth(this Transform transform, Transform target, float speed) => Vector3.RotateTowards(transform.forward, transform.GetDirectionToTarget(target), speed * Time.deltaTime, speed * Time.deltaTime);
+        public static Vector3 GetDirectionToTargetSmooth_Debug(this Transform transform, Transform target, float speed) 
         {
-            Debugar.DrawRay(transform.position, direccio);
-            Debugar.DrawRay(transform.position, Vector3.RotateTowards(transform.forward, direccio.normalized, quantitat * Time.deltaTime, quantitat * Time.deltaTime));
+            Debugar.DrawRay(transform.position, transform.GetDirectionToTarget(target), Color.green);
+            Debugar.DrawRay(transform.position, Vector3.RotateTowards(transform.forward, transform.GetDirectionToTarget(target), speed * Time.deltaTime, speed * Time.deltaTime), Color.yellow);
 
-            return Vector3.RotateTowards(transform.forward, direccio.normalized, quantitat * Time.deltaTime, quantitat * Time.deltaTime);
+            return transform.GetDirectionToTargetSmooth(target, speed);
+        } 
+
+
+        public static Vector3 GetDirectionAbsolute(this Transform transform, Vector3 position) => (position - transform.position).normalized;
+        public static Vector3 GetDirectionAbsoluteSmooth(this Transform transform, Vector3 direccio, float speed) => Vector3.RotateTowards(transform.forward, direccio.normalized, speed * Time.deltaTime, speed * Time.deltaTime);
+        public static Vector3 GetDirectionAbsoluteSmooth_Debug(this Transform transform, Vector3 direccio, float speed)
+        {
+            Debugar.DrawRay(transform.position, direccio, Color.green);
+            Debugar.DrawRay(transform.position, Vector3.RotateTowards(transform.forward, direccio.normalized, speed * Time.deltaTime, speed * Time.deltaTime), Color.yellow);
+
+            return transform.GetDirectionAbsoluteSmooth(direccio, speed);
         }
 
         //Canviar, no es a camara, es a un objecte qualsevol.
@@ -260,8 +273,8 @@ namespace XS_Utils
         /// </summary>
         /// <param name="debug">Instanciate a sphere where it collides</param>
         /// <returns></returns>
-        public static Vector3 HitRaig_DesdeCamara(bool debug = false) => HitRaig_DesdeCamara(Camera.main, Capes.Everything, debug);
-        public static Vector3 HitRaig_DesdeCamara(Camera camera, bool debug = false) => HitRaig_DesdeCamara(camera, Capes.Everything, debug);
+        public static Vector3 HitRaig_DesdeCamara(bool debug = false) => HitRaig_DesdeCamara(Camera.main, XS_Layers.Everything, debug);
+        public static Vector3 HitRaig_DesdeCamara(Camera camera, bool debug = false) => HitRaig_DesdeCamara(camera, XS_Layers.Everything, debug);
         public static Vector3 HitRaig_DesdeCamara(Camera camera, LayerMask layerMask, bool debug = false)
         {
             if (Physics.Raycast(camera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 300, layerMask))
@@ -291,9 +304,11 @@ namespace XS_Utils
         }
     }
 
-    public static class Capes
+    public static class XS_Layers
     {
         public static LayerMask Everything => -1;
+
+        public static bool Contains(this LayerMask layerMask, int layer) => (layerMask.value & (1 << layer)) > 0;
     }
 
     public static class XS_GameObject
@@ -757,7 +772,7 @@ namespace XS_Utils
         //    localizedString.GetLocalizedString().Completed += funcioAssincrone_EnCompletat;
     }
 
-
+    
     //FALTA:
     //Colliders in sphere i box.
     public static class XS_Physics
@@ -814,6 +829,20 @@ namespace XS_Utils
                 return distance;
             }
         }
+
+        public static bool IsAtDirectionOfTarget(this Rigidbody rigidbody, Collider me)
+        {
+            //Debugar.DrawRay(rigidbody.position, rigidbody.velocity.normalized, Color.red);
+            //Debugar.DrawRay(rigidbody.position, rigidbody.transform.GetDirectionToTarget(target.transform), Color.blue);
+            Debugar.DrawLine(rigidbody.position, me.ClosestPoint(rigidbody.position), Color.yellow);
+            //me.ClosestPoint(transform.position);
+            return Vector3.Dot(rigidbody.transform.GetDirectionAbsolute(me.ClosestPoint(rigidbody.position)), rigidbody.velocity.normalized) > 0.1f;
+        }
+        //public static bool IsAt
+
+
+
+
 
         public static Collider[] CollidersBox(Vector3 centre, Vector3 tamany, Quaternion orientacio, LayerMask layerMask)
         {
