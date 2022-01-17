@@ -359,6 +359,7 @@ namespace XS_Utils
 
             Func<Vector3> position;
             Func<Quaternion> rotation;
+            Action<GameObject> onRelease;
             Transform parent;
 
             Vector3 Position
@@ -388,10 +389,12 @@ namespace XS_Utils
                 original = _original;
                 position = _position;
                 rotation = _rotation;
+                onRelease += Release;
                 parent = _parent;
                 pool = new ObjectPool<GameObject>(Crear, OnPoolGet, OnPoolRelease);
                 initializated = true;
             }
+
             /// <summary>
             /// It's the main function to pull (or create) objects from Pool.
             /// It calls Initialize if it needs to don't care do it form outside.
@@ -399,6 +402,18 @@ namespace XS_Utils
             public GameObject Get(GameObject _original, Func<Vector3> _position, Func<Quaternion> _rotation, Transform _parent)
             {
                 if (!initializated) Initialize(_original, _position, _rotation, _parent);
+                return pool.Get();
+            }
+            /// <summary>
+            /// The same as before, but thsi one passes an specific function to call when the object is released.
+            /// </summary>
+            public GameObject Get(GameObject _original, Func<Vector3> _position, Func<Quaternion> _rotation, Action<GameObject> _onRelease, Transform _parent)
+            {
+                if (!initializated) 
+                {
+                    onRelease += _onRelease;
+                    Initialize(_original, _position, _rotation, _parent);
+                }
                 return pool.Get();
             }
 
@@ -411,7 +426,7 @@ namespace XS_Utils
             GameObject Crear()
             {
                 tmp = UnityEngine.Object.Instantiate(original);
-                tmp.AddComponent<PooledObject>().Iniciar(Release);
+                tmp.AddComponent<PooledObject>().Iniciar(onRelease);
                 return tmp;
             }
 
@@ -428,7 +443,8 @@ namespace XS_Utils
 
             /// <summary>
             /// This is called when and object of the Pool is release. It means that it can be Pulled again.
-            /// I just set the gameobject inactive. I don't know if I actually using it, but the Pooling system ask me for it.
+            /// It is usefull if you want to release the object without disabling it.
+            /// I just set the gameobject inactive. 
             /// </summary>
             void OnPoolRelease(GameObject _pooledObject) => _pooledObject.gameObject.SetActive(false);
 
@@ -463,7 +479,12 @@ namespace XS_Utils
             return pools[original].Get(original, position, rotation, parent).gameObject;
         }
 
-
+        public static GameObject Instantiate(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation, Action<GameObject> onRelease, Transform parent)
+        {
+            if (pools == null) pools = new Dictionary<GameObject, Pool>();
+            if (!pools.ContainsKey(original)) pools.Add(original, new Pool());
+            return pools[original].Get(original, position, rotation, parent).gameObject;
+        }
 
     }
 
@@ -617,7 +638,7 @@ namespace XS_Utils
     public static class MyCamera
     {
         static Camera camera;
-        public static Camera CameraMain 
+        public static Camera Main 
         {
             set => camera = value;
             get 
@@ -772,7 +793,19 @@ namespace XS_Utils
         //    localizedString.GetLocalizedString().Completed += funcioAssincrone_EnCompletat;
     }
 
-    
+    public static class XS_UI
+    {
+        /// <summary>
+        /// Returns the world space point of an UI element.
+        /// This is perfect to place objectes or efectes in the user interface.
+        /// </summary>
+        public static Vector3 ToWorldPosition(this RectTransform element)
+        {
+            RectTransformUtility.ScreenPointToWorldPointInRectangle(element, element.position, MyCamera.Main, out Vector3 result);
+            return result;
+        }
+            
+    }
     //FALTA:
     //Colliders in sphere i box.
     public static class XS_Physics
