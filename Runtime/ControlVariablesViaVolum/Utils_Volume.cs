@@ -14,7 +14,7 @@ public class Utils_Volume : MonoBehaviour
     
     [SerializeField] Types types;
     [SerializeField] LayerMask FindedObjectLayer;
-    [SerializeField] [Range(0, 10)] float range;
+    [SerializeField] [Range(0, 30)] float range;
     [SerializeField] float multiply;
     [SerializeField] UnityEvent<float> function;
     [Header("Debug")]
