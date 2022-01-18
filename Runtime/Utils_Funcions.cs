@@ -113,6 +113,24 @@ namespace XS_Utils
         {
             return transform.SetTransform(other.parent, other.localPosition, other.localEulerAngles, other.localScale);
         }
+
+
+
+        public static float Distance(this Vector3 position, Vector3 posicio, bool debug = false)
+        {
+            if (debug) Debugar.DrawLine(position, posicio, Color.yellow);
+            return (posicio - position).magnitude;
+        }
+        public static float Distance(this Transform transform, Vector3 posicio, bool debug = false)
+        {
+            if (debug) Debugar.DrawLine(transform.position, posicio, Color.yellow);
+            return (posicio - transform.position).magnitude;
+        }
+        public static float Distance(this Transform transform, Transform altre, bool debug = false)
+        {
+            if (debug) Debugar.DrawLine(transform.position, altre.position, Color.yellow);
+            return (altre.position - transform.position).magnitude;
+        }
     }
 
 
@@ -240,20 +258,6 @@ namespace XS_Utils
             _forward.Normalize();
 
             return _forward * direccio.y + camara.right * direccio.x;
-        }
-    }
-
-    public static class Distancia
-    {
-        public static float GetDistancia(this Transform transform, Vector3 posicio, bool debug = false)
-        {
-            if (debug) Debugar.DrawLine(transform.position, posicio, Color.yellow);
-            return (posicio - transform.position).magnitude;
-        }
-        public static float GetDistancia(this Transform transform, Transform altre, bool debug = false)
-        {
-            if (debug) Debugar.DrawLine(transform.position, altre.position, Color.yellow);
-            return (altre.position - transform.position).magnitude;
         }
     }
 
@@ -1141,11 +1145,15 @@ namespace XS_Utils
 
     public static class Shaders
     {
-        public static void SetVector(string propietat, Vector4 vector) => Shader.SetGlobalVector(propietat, vector);
-        public static Vector4 GetVector(string propietat) => Shader.GetGlobalVector(propietat);
-        public static void SetColor(string propietat, Color color) => Shader.SetGlobalColor(propietat, color);
-        public static void SetColor(string propietat, Vector4 vector) => Shader.SetGlobalColor(propietat, vector);
-        public static Vector4 GetColor(string propietat) => Shader.GetGlobalColor(propietat);
+        public static void SetGlobal(this Vector4 vector, string propietat) => Shader.SetGlobalVector(propietat, vector);
+        public static void SetGlobal(this Vector3 vector, string propietat) => Shader.SetGlobalVector(propietat, vector);
+        public static void SetGlobal(this Vector2 vector, string propietat) => Shader.SetGlobalVector(propietat, vector);
+        public static void SetGlobal(this float vector, string propietat) => Shader.SetGlobalFloat(propietat, vector);
+        public static void SetGlobal(this int vector, string propietat) => Shader.SetGlobalInt(propietat, vector);
+        public static void SetGlobal(this Color color, string propietat) => Shader.SetGlobalColor(propietat, color);
+        public static Vector4 GetGlobalVector(string propietat) => Shader.GetGlobalVector(propietat);
+        public static Vector4 GetlgobalColor(string propietat) => Shader.GetGlobalColor(propietat);
+
     }
 
 
