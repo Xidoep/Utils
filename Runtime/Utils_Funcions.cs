@@ -6,6 +6,7 @@ using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Pool;
 using UnityEngine.InputSystem;
+using UnityEngine.Localization.Settings;
 
 namespace XS_Utils
 {
@@ -34,62 +35,6 @@ namespace XS_Utils
     }
    
 
-    public static class Instanciar
-    {
-        /// <summary>
-        /// Crea una primitica Esfera
-        /// </summary>
-        public static GameObject Sphere(Transform transform, float temps = 0) => Sphere(transform, transform.localPosition, transform.localEulerAngles, Vector3.one, temps);
-        public static GameObject Sphere(Vector3 localPosition, Vector3 localRotation, float temps = 0) => Sphere(null, localPosition, localRotation, Vector3.one, temps);
-        public static GameObject Sphere(Transform parent, Vector3 localPosition, Vector3 localRotation, Vector3 localScale, float temps = 0)
-        {
-            GameObject _tmp = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            _tmp.transform.SetTransform(parent, localPosition, localRotation, localScale);
-            if (temps > 0) GameObject.Destroy(_tmp, temps);
-            return _tmp;
-        }
-
-        /// <summary>
-        /// Crea una primitiva Quad
-        /// </summary>
-
-        public static GameObject Quad(Transform parent, Vector3 localPosition, Vector3 localRotation, Vector3 localScale, float temps = 0)
-        {
-            GameObject _tmp = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            _tmp.transform.SetTransform(parent, localPosition, localRotation, localScale);
-            if (temps > 0) GameObject.Destroy(_tmp, temps);
-            return _tmp;
-        }
-
-        /// <summary>
-        /// Crea textMesh 
-        /// </summary>
-        public static TextMesh Texte(string texte, Transform parent, Vector3 localPosition, Vector3 localRotation, Vector3 localScale, float temps = 0)
-        {
-            TextMesh textMesh = new GameObject(texte, new System.Type[] { typeof(TextMesh) }).transform.SetTransform(parent, localPosition, localRotation, localScale).GetComponent<TextMesh>();
-            textMesh.text = texte;
-            if (temps > 0) GameObject.Destroy(textMesh.gameObject, temps);
-            return textMesh;
-        }
-
-        /// <summary>
-        /// Crea texte flotant que dura x segons
-        /// </summary>
-        public static TextMeshPro TexteFlotant(string texte, Transform parent, Vector3 localPosition)
-        {
-            TextMeshPro textMeshPro = new GameObject(texte, new System.Type[] { typeof(TextMeshPro) }).GetComponent<TextMeshPro>();
-            textMeshPro.transform.SetTransform(parent, localPosition, XS_Direction.ACamara(), Vector3.one);
-            textMeshPro.text = texte;
-            textMeshPro.alignment = TextAlignmentOptions.Center;
-            return textMeshPro;
-        }
-        public static TextMeshPro TexteFlotant(string texte, Transform parent, Vector3 localPosition, float temps)
-        {
-            TextMeshPro textMeshPro = TexteFlotant(texte, parent, localPosition);
-            GameObject.Destroy(textMeshPro.gameObject, temps);
-            return textMeshPro;
-        }
-    }
 
     public static class XS_Transform
     {
@@ -268,45 +213,72 @@ namespace XS_Utils
         /// It needs "using UnityEngine.InputSystem;" to refere to Key.
         /// </summary>
         public static bool OnPress(this Key key) => Keyboard.current[key].wasPressedThisFrame;
-    }
 
-    public static class Mouse
-    {
+        public static bool GetBool(this InputActionReference inputActionReference) => inputActionReference.action.ReadValue<float>() > 0.1f;
+
+        public static float GetFloat(this InputActionReference inputActionReference) => inputActionReference.action.ReadValue<float>();
+        public static Vector2 GetVector2(this InputActionReference inputActionReference) => inputActionReference.action.ReadValue<Vector2>();
+        public static void OnPerformedAdd(this InputActionReference inputActionReference, Action<InputAction.CallbackContext> action) => inputActionReference.action.performed += action;
+        public static void OnPerformedRemove(this InputActionReference inputActionReference, Action<InputAction.CallbackContext> action) => inputActionReference.action.performed -= action;
+        public static bool ComparePath(this InputBinding inputBinding, string path) => inputBinding.PathOrOverridePath() == path;
+
+        public static string PathOrOverridePath(this InputBinding inputBinding)
+        {
+            if (string.IsNullOrEmpty(inputBinding.overridePath))
+                return inputBinding.path;
+            else return inputBinding.overridePath;
+        }
+
         /// <summary>
-        /// Throw a ray from mouse position and return de Vector3 where it collides.
+        /// 
         /// </summary>
-        /// <param name="debug">Instanciate a sphere where it collides</param>
-        /// <returns></returns>
-        public static Vector3 HitRaig_DesdeCamara(bool debug = false) => HitRaig_DesdeCamara(Camera.main, XS_Layers.Everything, debug);
-        public static Vector3 HitRaig_DesdeCamara(Camera camera, bool debug = false) => HitRaig_DesdeCamara(camera, XS_Layers.Everything, debug);
-        public static Vector3 HitRaig_DesdeCamara(Camera camera, LayerMask layerMask, bool debug = false)
+        public static InputDevice GetDevice() => PlayerInput.GetPlayerByIndex(0).devices[0];
+        public static InputDevice GetDevice(int playerIndex) => PlayerInput.GetPlayerByIndex(playerIndex).devices[0];
+
+        public static Vector3 MouseRayCastFromCamera_Point() => MouseRayCastFromCamera_Point(MyCamera.Main, XS_Layers.Everything);
+        public static Vector3 MouseRayCastFromCamera_Point(Camera camera) => MouseRayCastFromCamera_Point(camera, XS_Layers.Everything);
+        public static Vector3 MouseRayCastFromCamera_Point(LayerMask layerMask) => MouseRayCastFromCamera_Point(MyCamera.Main, layerMask);
+        public static Vector3 MouseRayCastFromCamera_Point(Camera camera, LayerMask layerMask)
         {
             if (Physics.Raycast(camera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 300, layerMask))
             {
-                if (debug) Instanciar.Sphere(null, hit.point, Vector3.zero, Vector3.one * 0.1f);
+#if UNITY_EDITOR
+                Debugar.Primitive(PrimitiveType.Sphere, hit.point, Vector3.one * 0.1f, 1);
+#endif
                 return hit.point;
             }
             else
             {
-                if (debug) Instanciar.Sphere(null, camera.ScreenToWorldPoint(camera.ScreenPointToRay(Input.mousePosition).origin + Vector3.forward * 300), Vector3.zero, Vector3.one * 0.1f);
+#if UNITY_EDITOR
+                Debugar.Primitive(PrimitiveType.Sphere, camera.ScreenToWorldPoint(camera.ScreenPointToRay(Input.mousePosition).origin + Vector3.forward * 300), Vector3.one * 0.1f, 1);
+#endif
                 return camera.ScreenToWorldPoint(camera.ScreenPointToRay(Input.mousePosition).origin + Vector3.forward * 300);
             }
         }
 
-        public static GameObject HitRay_DesdeCamara(Camera camera, LayerMask layerMask, bool debug = false)
+
+        public static GameObject MouseRayCastFromCamera() => MouseRayCastFromCamera(MyCamera.Main, XS_Layers.Everything);
+        public static GameObject MouseRayCastFromCamera(Camera camera) => MouseRayCastFromCamera(camera, XS_Layers.Everything);
+        public static GameObject MouseRayCastFromCamera(LayerMask layerMask) => MouseRayCastFromCamera(MyCamera.Main, layerMask);
+        public static GameObject MouseRayCastFromCamera(Camera camera, LayerMask layerMask)
         {
             if (Physics.Raycast(camera.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 300, layerMask))
             {
-                if (debug) Instanciar.Sphere(null, hit.point, Vector3.zero, Vector3.one * 0.1f);
+#if UNITY_EDITOR
+                Debugar.Primitive(PrimitiveType.Sphere, hit.point, Vector3.one * 0.1f, 1);
+#endif
                 return hit.collider.gameObject;
             }
             else
             {
-                if (debug) Instanciar.Sphere(null, camera.ScreenToWorldPoint(camera.ScreenPointToRay(Input.mousePosition).origin + Vector3.forward * 300), Vector3.zero, Vector3.one * 0.1f);
+#if UNITY_EDITOR
+                Debugar.Primitive(PrimitiveType.Sphere, camera.ScreenToWorldPoint(camera.ScreenPointToRay(Input.mousePosition).origin + Vector3.forward * 300), Vector3.one * 0.1f, 1);
+#endif
                 return null;
             }
         }
     }
+
 
     public static class XS_Layers
     {
@@ -317,7 +289,7 @@ namespace XS_Utils
 
     public static class XS_GameObject
     {
-        #region SetActive Tools
+#region SetActive Tools
         class ControlTempsMonoBehavior : MonoBehaviour { }
         static ControlTempsMonoBehavior controlTempsMonoBehavior;
         static void Init()
@@ -334,7 +306,7 @@ namespace XS_Utils
             yield return waitForSeconds;
             gameObject.SetActive(value);
         }
-        #endregion
+#endregion
         public static Coroutine SetActive(this GameObject gameObject, bool value, float temps)
         {
             Init();
@@ -348,7 +320,7 @@ namespace XS_Utils
         /// <summary>
         /// Instantiate objects using the Pooling system
         /// </summary>
-        #region Instantiate Tools
+#region Instantiate Tools
         //When an object is instantiated and item of the dictionary is created, with the Prefab as key and the Pool used for this prefab.
         //If the dictionary already contains de prefab we want to create, it takes the Pool refered instead of creating a new one
         static Dictionary<GameObject, Pool> pools;
@@ -469,9 +441,7 @@ namespace XS_Utils
             public void Iniciar(Action<GameObject> enRelease) => this.enRelease = enRelease;
             private void OnDisable() => enRelease.Invoke(gameObject);
         }
-        #endregion
-
-
+#endregion
 
         public static GameObject Instantiate(this GameObject original) => Instantiate(original, null, null, null);
         public static GameObject Instantiate(this GameObject original, Func<Vector3> position) => original.Instantiate(position, null, null);
@@ -482,7 +452,6 @@ namespace XS_Utils
             if (!pools.ContainsKey(original)) pools.Add(original, new Pool());
             return pools[original].Get(original, position, rotation, parent).gameObject;
         }
-
         public static GameObject Instantiate(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation, Action<GameObject> onRelease, Transform parent)
         {
             if (pools == null) pools = new Dictionary<GameObject, Pool>();
@@ -490,6 +459,7 @@ namespace XS_Utils
             return pools[original].Get(original, position, rotation, parent).gameObject;
         }
 
+        
     }
 
 
@@ -726,7 +696,7 @@ namespace XS_Utils
         public static string ToRellotge(this int number) => $"{(((int)number) / 60).ToString("00")}:{(((int)number)%60).ToString("00")}";
     }
 
-    public static class Animacio
+    public static class XS_Animation
     {
         /// <summary>
         /// Retorna una extrapolacio de en quina direccio s'hauria d'orientar l'animacio, 
@@ -774,7 +744,7 @@ namespace XS_Utils
         ///Aixì ja ho pots agafar amb animator.GetFloat(nom);
     }
 
-    public static class Particules
+    public static class XS_ParticleSystem
     {
         static ParticleSystem.MainModule mainModule;
         static ParticleSystem.EmissionModule emissionModule;
@@ -806,15 +776,13 @@ namespace XS_Utils
         public static bool IsEmitting(this ParticleSystem particleSystem) => particleSystem.isEmitting;
     }
 
-    public static class Traduccio
+    public static class XS_Localization
     {
-        /// <summary>
-        /// Rep la traduccio.
-        /// </summary>
-        /// <param name="localizedString"></param>
-        /// <param name="funcioAssincrone_EnCompletat"></param>
-        //public static void GetTraduccio(this LocalizedString localizedString, Action<AsyncOperationHandle<string>> funcioAssincrone_EnCompletat) => 
-        //    localizedString.GetLocalizedString().Completed += funcioAssincrone_EnCompletat;
+        public static void SelectLanguage(this int localeIndex)
+        {
+            LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[localeIndex];
+        }
+        public static int Languages => LocalizationSettings.AvailableLocales.Locales.Count;
     }
 
     public static class XS_UI
@@ -928,9 +896,9 @@ namespace XS_Utils
         
     }
 
-    public static class Web
+    public static class XS_Web
     {
-        #region Get_Utils
+#region Get_Utils
         const string PNG = ".png";
         const string JPG = ".jpg";
         const string WEBP = ".webp";
@@ -1010,13 +978,13 @@ namespace XS_Utils
             Debugar.Log("He acabat");
             enImatgesTrobades.Invoke(sprites.ToArray());
         }
-        #endregion
+#endregion
 
 
         public static void GetJPGs(string url, Action enAcabat, Action<Sprite[]> enImatgesTrobades)
         {
             List<Sprite> sprites = new List<Sprite>();
-            Web.Get(url,
+            XS_Web.Get(url,
                 (string error) =>
                 {
                     Debugar.Log("Error: " + error);
@@ -1030,7 +998,7 @@ namespace XS_Utils
                             Debugar.Log(item.Length);
                             Debugar.Log(item.Substring(1, item.IndexOf(JPG, StringComparison.Ordinal)));
 
-                            Web.GetTextura(item.Substring(1, item.IndexOf(JPG, StringComparison.Ordinal) + 3), (string error) =>
+                            XS_Web.GetTextura(item.Substring(1, item.IndexOf(JPG, StringComparison.Ordinal) + 3), (string error) =>
                             {
                                 Debugar.Log("Error: " + error);
                             }, texture2D =>
@@ -1047,7 +1015,7 @@ namespace XS_Utils
         public static void GetWEBP(string url, Action enAcabat, Action<Sprite[]> enImatgesTrobades)
         {
             List<Sprite> sprites = new List<Sprite>();
-            Web.Get(url,
+            XS_Web.Get(url,
                 (string error) =>
                 {
                     Debugar.Log("Error: " + error);
@@ -1061,7 +1029,7 @@ namespace XS_Utils
                             Debugar.Log(item.Length);
                             Debugar.Log(item.Substring(1, item.IndexOf(WEBP)));
 
-                            Web.GetTextura(item.Substring(1, item.IndexOf(WEBP) + 3), (string error) =>
+                            XS_Web.GetTextura(item.Substring(1, item.IndexOf(WEBP) + 3), (string error) =>
                             {
                                 Debugar.Log("Error: " + error);
                             }, (Texture2D texture2D) =>
@@ -1128,7 +1096,39 @@ namespace XS_Utils
 #endif
         }
 
-        #region VisualitzarCollider_Utils
+        static GameObject primitive;
+        public static void Primitive(PrimitiveType primitiveType, Vector3 position, Quaternion rotation, Vector3 scale, Transform parent, float time = 0)
+        {
+#if UNITY_EDITOR
+            primitive = GameObject.CreatePrimitive(primitiveType);
+            primitive.transform.SetTransform(parent, position, rotation.eulerAngles, scale);
+            if (time > 0) GameObject.Destroy(primitive, time);
+#endif
+        }
+        public static void Primitive(PrimitiveType primitiveType, Vector3 position, float time = 0) => Primitive(primitiveType, position, Quaternion.identity, Vector3.one, null, time);
+        public static void Primitive(PrimitiveType primitiveType, Vector3 position, Vector3 scale, float time = 0) => Primitive(primitiveType, position, Quaternion.identity, scale, null, time);
+        public static void Primitive(PrimitiveType primitiveType, Vector3 position, Quaternion rotation, float time = 0) => Primitive(primitiveType, position, rotation, Vector3.one, null, time);
+        public static void Primitive(PrimitiveType primitiveType, Vector3 position, Quaternion rotation, Vector3 scale, float time = 0) => Primitive(primitiveType, position, rotation, scale, null, time);
+        public static void Primitive(PrimitiveType primitiveType, Vector3 position, Quaternion rotation, Transform parent, float time = 0) => Primitive(primitiveType, position, rotation, Vector3.one, parent, time);
+        public static void Primitive(PrimitiveType primitiveType, Vector3 position, Transform parent, float time = 0) => Primitive(primitiveType, position, Quaternion.identity, Vector3.one, parent, time);
+        public static void Primitive(PrimitiveType primitiveType, Transform transform, Transform parent, float time = 0) => Primitive(primitiveType, transform.position, transform.rotation, Vector3.one, parent, time);
+        public static void Primitive(PrimitiveType primitiveType, Transform transform, float time = 0) => Primitive(primitiveType, transform.position, transform.rotation, Vector3.one, null, time);
+
+        static TextMesh textMesh;
+        public static TextMesh FloatingText(this string text, Vector3 position, float time = 0)
+        {
+#if UNITY_EDITOR
+            textMesh = new GameObject(text, new Type[] { typeof(TextMesh), typeof(Utils_MirarCamara) }).GetComponent<TextMesh>();
+            textMesh.transform.position = position;
+            textMesh.text = text;
+            if (time > 0) GameObject.Destroy(textMesh.gameObject, time);
+#endif
+            return textMesh;
+        }
+        public static void FloatingText(this string text, Transform transform, float time = 0) => text.FloatingText(transform.position, time);
+
+
+#region VisualitzarCollider_Utils
         static void Linia(Transform transform, Vector3 tamany, Vector3 inici, Vector3 final)
         {
             Debug.DrawLine(
@@ -1136,7 +1136,7 @@ namespace XS_Utils
                 transform.position + new Vector3(final.x * tamany.x, final.y * tamany.y, final.z * tamany.z),
                 Color.red);
         }
-        #endregion
+#endregion
         /// <summary>
         /// Dibuixa un cub a partir d'un transform un un tamany.
         /// </summary>
@@ -1163,7 +1163,7 @@ namespace XS_Utils
         }
     }
 
-    public static class Shaders
+    public static class XS_Shader
     {
         public static void SetGlobal(this Vector4 vector, string propietat) => Shader.SetGlobalVector(propietat, vector);
         public static void SetGlobal(this Vector3 vector, string propietat) => Shader.SetGlobalVector(propietat, vector);
