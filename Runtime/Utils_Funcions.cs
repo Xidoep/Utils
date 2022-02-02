@@ -42,7 +42,15 @@ namespace XS_Utils
         /// Setup the transform with given information.
         /// It's useful when you want to position a transform like when you Instantiate it, but you can't do it directly.
         /// </summary>
-        public static Transform SetTransform(this Transform transform, Transform parent, Vector3 localPosition, Vector3 localEulerAngles, Vector3 localScale)
+        public static Transform SetTransform(this Transform transform, Vector3 localPosition, Quaternion localRotation, Vector3 localScale, Transform parent = null)
+        {
+            transform.SetParent(parent);
+            transform.localPosition = localPosition;
+            transform.localRotation = localRotation;
+            transform.localScale = localScale;
+            return transform;
+        }
+        public static Transform SetTransform(this Transform transform, Vector3 localPosition, Vector3 localEulerAngles, Vector3 localScale, Transform parent = null)
         {
             transform.SetParent(parent);
             transform.localPosition = localPosition;
@@ -56,7 +64,7 @@ namespace XS_Utils
         /// </summary>
         public static Transform Equalize(this Transform transform, Transform other)
         {
-            return transform.SetTransform(other.parent, other.localPosition, other.localEulerAngles, other.localScale);
+            return transform.SetTransform(other.localPosition, other.localEulerAngles, other.localScale, other.parent);
         }
 
 
@@ -1102,7 +1110,7 @@ namespace XS_Utils
         {
 #if UNITY_EDITOR
             primitive = GameObject.CreatePrimitive(primitiveType);
-            primitive.transform.SetTransform(parent, position, rotation.eulerAngles, scale);
+            primitive.transform.SetTransform(position, rotation.eulerAngles, scale, parent);
             if (time > 0) GameObject.Destroy(primitive, time);
 #endif
         }
