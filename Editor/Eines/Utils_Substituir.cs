@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using XS_Utils;
 
 public class Utils_Substituir : EditorWindow
 {
@@ -59,7 +58,9 @@ public class Utils_Substituir : EditorWindow
             {
 
                 GameObject obj = (GameObject)PrefabUtility.InstantiatePrefab(nouObjecte);
-                obj.transform.Equalize(elementsASubstitur[i].transform);
+                obj.transform.position = elementsASubstitur[i].transform.position;
+                obj.transform.rotation = elementsASubstitur[i].transform.rotation;
+                obj.transform.localScale = elementsASubstitur[i].transform.localScale;
                 Undo.RegisterCreatedObjectUndo(obj, "crear susititucions");
             }
 

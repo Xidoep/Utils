@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-[AddComponentMenu("Xido Studio/Utils/UI Interactuable")]
+/// <summary>
+/// Expose interatable of an UI element to be called form outside
+/// </summary>
 public class Utils_UiInteractuable : MonoBehaviour
 {
     [Informacio] public string Info = "Canvia un UI seleccionable, si es interactuable o no";
-    public Selectable selectable;
+    [SerializeField] Selectable selectable;
 
     public void Interactuable(bool interactuable)
     {

@@ -221,7 +221,6 @@ namespace XS_Utils
         /// It needs "using UnityEngine.InputSystem;" to refere to Key.
         /// </summary>
         public static bool OnPress(this Key key) => Keyboard.current[key].wasPressedThisFrame;
-
         public static bool GetBool(this InputActionReference inputActionReference) => inputActionReference.action.ReadValue<float>() > 0.1f;
 
         public static float GetFloat(this InputActionReference inputActionReference) => inputActionReference.action.ReadValue<float>();
