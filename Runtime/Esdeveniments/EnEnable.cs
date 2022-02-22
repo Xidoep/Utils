@@ -3,7 +3,7 @@ using UnityEngine.Events;
 
 public class EnEnable : MonoBehaviour
 {
-    public UnityEvent esdeveniment;
+    [SerializeField] UnityEvent esdeveniment;
 
     private void OnEnable() => esdeveniment.Invoke();
 }

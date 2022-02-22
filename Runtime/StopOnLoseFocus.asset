@@ -9,7 +9,6 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c460ed18bf3761c4f96e170fff893524, type: 3}
-  m_Name: Limitar FrameRate
+  m_Script: {fileID: 11500000, guid: b9173c65a2ec6c849a80243eaf2bc4e2, type: 3}
+  m_Name: StopOnLoseFocus
   m_EditorClassIdentifier: 
-  frameRate: 60

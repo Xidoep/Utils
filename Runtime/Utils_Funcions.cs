@@ -551,7 +551,10 @@ namespace XS_Utils
 
     public static class XS_Coroutine
     {
-        class CorrutinaEstaticaMonoBehavior : MonoBehaviour { }
+        class CorrutinaEstaticaMonoBehavior : MonoBehaviour 
+        {
+            private void OnDisable() => Destroy(this.gameObject);
+        }
         static CorrutinaEstaticaMonoBehavior corrutinaEstaticaMonoBehavior;
         static void Init()
         {
