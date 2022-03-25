@@ -11,7 +11,7 @@ public class EnEnable_Temps : MonoBehaviour
 
 
 
-    private void OnEnable() => XS_Coroutine.StartCoroutine(temps, Invocar);
+    private void OnEnable() => XS_Coroutine.StartCoroutine_Ending(temps, Invocar);
 
     void Invocar() => esdeveniment.Invoke();
 }

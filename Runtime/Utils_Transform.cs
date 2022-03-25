@@ -1,18 +1,30 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace XS_Utils
 {
-    public static class Utils_Transform
+    public static class XS_Transform
     {
-        /*public static Transform SetTransform(this Transform transform, Transform parent, Vector3 localPosition, Vector3 localEulerAngles, Vector3 localScale)
+        /// <summary>
+        /// Setup the transform with given information.
+        /// It's useful when you want to position a transform like when you Instantiate it, but you can't do it directly.
+        /// </summary>
+        public static Transform SetTransform(this Transform transform, Vector3 localPosition, Quaternion localRotation, Vector3 localScale, Transform parent = null)
         {
-            transform.SetParent(parent);
-            transform.localPosition = localPosition;
-            transform.localEulerAngles = localEulerAngles;
-            transform.localScale = localScale;
-            return transform;
+            Transform _t = transform;
+            _t.SetParent(parent);
+            _t.localPosition = localPosition;
+            _t.localRotation = localRotation;
+            _t.localScale = localScale;
+            return _t;
+        }
+        public static Transform SetTransform(this Transform transform, Vector3 localPosition, Vector3 localEulerAngles, Vector3 localScale, Transform parent = null)
+        {
+            Transform _t = transform;
+            _t.SetParent(parent);
+            _t.localPosition = localPosition;
+            _t.localEulerAngles = localEulerAngles;
+            _t.localScale = localScale;
+            return _t;
         }
 
         /// <summary>
@@ -20,7 +32,7 @@ namespace XS_Utils
         /// </summary>
         public static Transform Equalize(this Transform transform, Transform other)
         {
-            return transform.SetTransform(other.parent, other.localPosition, other.localEulerAngles, other.localScale);
+            return transform.SetTransform(other.localPosition, other.localEulerAngles, other.localScale, other.parent);
         }
 
 
@@ -39,7 +51,7 @@ namespace XS_Utils
         {
             if (debug) Debugar.DrawLine(transform.position, altre.position, Color.yellow);
             return (altre.position - transform.position).magnitude;
-        }*/
+        }
     }
 }
 

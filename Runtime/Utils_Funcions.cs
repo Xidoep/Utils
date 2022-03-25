@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.Networking;
 using UnityEngine.Pool;
 using UnityEngine.InputSystem;
@@ -10,7 +11,7 @@ using UnityEngine.Localization.Settings;
 
 namespace XS_Utils
 {
-    namespace XS_Singleton
+    /*namespace XS_Singleton
     {
         public abstract class Singleton<T> : MonoBehaviour where T : MonoBehaviour
         {
@@ -32,11 +33,11 @@ namespace XS_Utils
                 base.Awake();
             }
         }
-    }
+    }*/
    
 
 
-    public static class XS_Transform
+    /*public static class XS_Transform
     {
         /// <summary>
         /// Setup the transform with given information.
@@ -44,19 +45,21 @@ namespace XS_Utils
         /// </summary>
         public static Transform SetTransform(this Transform transform, Vector3 localPosition, Quaternion localRotation, Vector3 localScale, Transform parent = null)
         {
-            transform.SetParent(parent);
-            transform.localPosition = localPosition;
-            transform.localRotation = localRotation;
-            transform.localScale = localScale;
-            return transform;
+            Transform _t = transform;
+            _t.SetParent(parent);
+            _t.localPosition = localPosition;
+            _t.localRotation = localRotation;
+            _t.localScale = localScale;
+            return _t;
         }
         public static Transform SetTransform(this Transform transform, Vector3 localPosition, Vector3 localEulerAngles, Vector3 localScale, Transform parent = null)
         {
-            transform.SetParent(parent);
-            transform.localPosition = localPosition;
-            transform.localEulerAngles = localEulerAngles;
-            transform.localScale = localScale;
-            return transform;
+            Transform _t = transform;
+            _t.SetParent(parent);
+            _t.localPosition = localPosition;
+            _t.localEulerAngles = localEulerAngles;
+            _t.localScale = localScale;
+            return _t;
         }
 
         /// <summary>
@@ -84,10 +87,9 @@ namespace XS_Utils
             if (debug) Debugar.DrawLine(transform.position, altre.position, Color.yellow);
             return (altre.position - transform.position).magnitude;
         }
-    }
+    }*/
 
-
-    public static class XS_Movement
+    /*public static class XS_Movement
     {
         /// <summary>
         /// Move the given transform to an absolute direction
@@ -103,9 +105,9 @@ namespace XS_Utils
         /// Move the given transform to a target on the world.
         /// </summary>
         public static void MoveToTarget(this Transform transform, Transform objectiu, float speed) => transform.localPosition += transform.GetDirectionToTarget(objectiu) * speed;
-    }
+    }*/
 
-    public static class XS_Rotation
+    /*public static class XS_Rotation
     {
         /// <summary>
         /// It heads the forward axis of the given transform to the main camera.
@@ -146,9 +148,9 @@ namespace XS_Utils
         /// It smoothly rotates the given transform to math the given rotation
         /// </summary>
         public static void RotateToQuaternionSmooth(this Transform transform, Quaternion rotation, float speed = 1) => transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, speed);
-    }
+    }*/
 
-    public static class XS_Direction
+    /*public static class XS_Direction
     {
         /// <summary>
         /// It gets the direction to a given direction relative to the given transform.
@@ -177,13 +179,13 @@ namespace XS_Utils
         /// Gets the direction to a target smoothly.
         /// </summary>
         public static Vector3 GetDirectionToTargetSmooth(this Transform transform, Transform target, float speed) => Vector3.RotateTowards(transform.forward, transform.GetDirectionToTarget(target), speed * Time.deltaTime, speed * Time.deltaTime);
-        public static Vector3 GetDirectionToTargetSmooth_Debug(this Transform transform, Transform target, float speed) 
+        public static Vector3 GetDirectionToTargetSmooth_Debug(this Transform transform, Transform target, float speed)
         {
             Debugar.DrawRay(transform.position, transform.GetDirectionToTarget(target), Color.green);
             Debugar.DrawRay(transform.position, Vector3.RotateTowards(transform.forward, transform.GetDirectionToTarget(target), speed * Time.deltaTime, speed * Time.deltaTime), Color.yellow);
 
             return transform.GetDirectionToTargetSmooth(target, speed);
-        } 
+        }
 
 
         public static Vector3 GetDirectionAbsolute(this Transform transform, Vector3 position) => (position - transform.position).normalized;
@@ -203,7 +205,7 @@ namespace XS_Utils
         {
             return Camera.main != null ? Camera.main.transform.forward : Vector3.zero;
         }
-        
+
         public static Vector3 ACamaraRelatiu(this Transform camara, Vector2 direccio)
         {
             Vector3 _forward = camara.forward;
@@ -212,9 +214,9 @@ namespace XS_Utils
 
             return _forward * direccio.y + camara.right * direccio.x;
         }
-    }
+    }*/
 
-    public static class XS_Input
+    /*public static class XS_Input
     {
         /// <summary>
         /// Is listening the given key of the InputSystem and returns TRUE at the frame it is pressed. Otherwise it returns FALSE.
@@ -284,17 +286,16 @@ namespace XS_Utils
                 return null;
             }
         }
-    }
+    }*/
 
-
-    public static class XS_Layers
+    /*public static class XS_Layers
     {
         public static LayerMask Everything => -1;
         public static int GetLayer(string name) => LayerMask.NameToLayer(name);
         public static bool Contains(this LayerMask layerMask, int layer) => (layerMask.value & (1 << layer)) > 0;
-    }
+    }*/
 
-    public static class XS_GameObject
+    /*public static class XS_GameObject
     {
 #region SetActive Tools
         class ControlTempsMonoBehavior : MonoBehaviour { }
@@ -320,9 +321,9 @@ namespace XS_Utils
             WaitForSecondsRealtime waitForSeconds = new WaitForSecondsRealtime(temps);
             return controlTempsMonoBehavior.StartCoroutine(SetActivaCorrutine(gameObject, value, waitForSeconds));
         }
-    }
+    }*/
 
-    public static class XS_Instantiate
+    /*public static class XS_Instantiate
     {
         /// <summary>
         /// Instantiate objects using the Pooling system
@@ -467,14 +468,13 @@ namespace XS_Utils
         }
 
         
-    }
-
+    }*/
 
     /// <summary>
     /// Non-static class made to have a "time" with all possible functionalities.
     /// It have to be initated with the builder, with a time and a funtions to call on end.
     /// </summary>
-    public class Countdown
+    /*public class Countdown
     {
         float time;
         Action onEnd;
@@ -547,9 +547,9 @@ namespace XS_Utils
         {
             active = false;
         }
-    }
+    }*/
 
-    public static class XS_Coroutine
+    /*public static class XS_Coroutine
     {
         class CorrutinaEstaticaMonoBehavior : MonoBehaviour 
         {
@@ -617,9 +617,9 @@ namespace XS_Utils
         }
 
         static bool InfiniteLoop() => false;
-    }
+    }*/
 
-    public static class MyCamera
+    /*public static class MyCamera
     {
         static Camera camera;
         public static Camera Main 
@@ -632,9 +632,9 @@ namespace XS_Utils
             }
         }
         public static Transform Transform => camera.transform;
-    }
+    }*/
 
-    public static class To
+    /*public static class To
     {
         static List<Color> colors;
 
@@ -698,15 +698,11 @@ namespace XS_Utils
 
         static System.Text.StringBuilder stringBuilder;
 
-        /// <summary>
-        /// Return a string in format 00:00 from an integrer.
-        /// </summary>
-        /// <param name="number"></param>
-        /// <returns></returns>
-        public static string ToRellotge(this int number) => $"{(((int)number) / 60).ToString("00")}:{(((int)number)%60).ToString("00")}";
-    }
+        public static string ToTime(this float seconds) => TimeSpan.FromSeconds((double)seconds).ToString("mm':'ss");
+        public static string ToTime(this int seconds) => TimeSpan.FromSeconds((double)seconds).ToString("mm':'ss");
+    }*/
 
-    public static class XS_Animation
+    /*public static class XS_Animation
     {
         /// <summary>
         /// Retorna una extrapolacio de en quina direccio s'hauria d'orientar l'animacio, 
@@ -749,12 +745,13 @@ namespace XS_Utils
 
         }
 
+        public static int ToHash(this string name) => Animator.StringToHash(name);
         ///LLEGIR CUSTOM CURVE
         ///Si crees un parametre al animator amb el mateix nom que la corva, ho captura automaticament.
         ///Aixì ja ho pots agafar amb animator.GetFloat(nom);
-    }
+    }*/
 
-    public static class XS_ParticleSystem
+    /*public static class XS_ParticleSystem
     {
         static ParticleSystem.MainModule mainModule;
         static ParticleSystem.EmissionModule emissionModule;
@@ -784,18 +781,18 @@ namespace XS_Utils
         public static void Stop(this ParticleSystem particleSystem) => particleSystem.Stop();
 
         public static bool IsEmitting(this ParticleSystem particleSystem) => particleSystem.isEmitting;
-    }
+    }*/
 
-    public static class XS_Localization
+    /*public static class XS_Localization
     {
         public static void SelectLanguage(this int localeIndex)
         {
             LocalizationSettings.SelectedLocale = LocalizationSettings.AvailableLocales.Locales[localeIndex];
         }
         public static int Languages => LocalizationSettings.AvailableLocales.Locales.Count;
-    }
+    }*/
 
-    public static class XS_UI
+    /*public static class XS_UI
     {
         /// <summary>
         /// Returns the world space point of an UI element.
@@ -808,10 +805,13 @@ namespace XS_Utils
         }
             
         public static Vector3 ToCanvas(this Vector3 position) => MyCamera.Main.WorldToScreenPoint(position);
-    }
+
+        public static bool IsOn(this Toggle toggle, float value) => toggle.isOn = !value.IsNear(0, 0.01f);
+    }*/
+
     //FALTA:
     //Colliders in sphere i box.
-    public static class XS_Physics
+    /*public static class XS_Physics
     {
         static RaycastHit hit;
         static Collider[] results;
@@ -891,9 +891,13 @@ namespace XS_Utils
             
             return Physics.OverlapBoxNonAlloc(centre, tamany / 2f, results, orientacio, layerMask) > 0;
         }
-    }
+        public static Collider[] CollidersSphere(Vector3 centre, float radi)
+        {
+            return Physics.OverlapSphere(centre, radi);
+        }
+    }*/
 
-    public static class XS_Compare
+    /*public static class XS_Compare
     {
         /// <summary>
         /// Comprova si un float esta aprop d'un altre (dins un rang).
@@ -905,9 +909,9 @@ namespace XS_Utils
         public static bool IsNear(this float valor, float altre, float rang) => valor == Mathf.Clamp(valor, altre + rang, altre - rang);
         public static bool IsNear(this Vector3 valor, Vector3 altre, float rang) => Vector3.Distance(valor, altre) < rang;
         
-    }
+    }*/
 
-    public static class XS_Web
+    /*public static class XS_Web
     {
 #region Get_Utils
         const string PNG = ".png";
@@ -1053,9 +1057,9 @@ namespace XS_Utils
                     webRequestMonoBehaviour.StartCoroutine(GetWEBPCorrutine(sprites, enAcabat, enImatgesTrobades));
                 });
         }
-    }
+    }*/
 
-    public static class Debugar
+    /*public static class Debugar
     {
         /// <summary>
         /// Escriu un Log a la consola que no s'escriurà fora de l'editor. 
@@ -1172,9 +1176,9 @@ namespace XS_Utils
             Linia(transform, tamany, -transform.right - transform.up - transform.forward, -transform.right + transform.up - transform.forward);
 #endif
         }
-    }
+    }*/
 
-    public static class XS_Shader
+    /*public static class XS_Shader
     {
         public static void SetGlobal(this Vector4 vector, string propietat) => Shader.SetGlobalVector(propietat, vector);
         public static void SetGlobal(this Vector3 vector, string propietat) => Shader.SetGlobalVector(propietat, vector);
@@ -1185,12 +1189,12 @@ namespace XS_Utils
         public static Vector4 GetGlobalVector(string propietat) => Shader.GetGlobalVector(propietat);
         public static Vector4 GetlgobalColor(string propietat) => Shader.GetGlobalColor(propietat);
 
-    }
+    }*/
 
-    public static class XS_Vectors
+    /*public static class XS_Vectors
     {
 
         public static Vector3 Dot1 => Vector3.one * 0.1f;
         public static Vector3 Half => Vector3.one * 0.5f; 
-    }
+    }*/
 }

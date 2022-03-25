@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
 
-public class Utils_ExportadorDePackages : MonoBehaviour
+public class Utils_ExportadorDePackages
 {
     [MenuItem("Assets/XidoStudio Exportador")]
     static void Exportar()
