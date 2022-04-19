@@ -26,7 +26,22 @@ namespace XS_Utils
             _t.localScale = localScale;
             return _t;
         }
-
+        public static Transform SetTransform(this Transform transform, Vector3 localPosition, Quaternion localRotation, Transform parent = null)
+        {
+            Transform _t = transform;
+            _t.SetParent(parent);
+            _t.localPosition = localPosition;
+            _t.localRotation = localRotation;
+            return _t;
+        }
+        public static Transform SetTransform(this Transform transform, Vector3 localPosition, Vector3 localEulerAngles, Transform parent = null)
+        {
+            Transform _t = transform;
+            _t.SetParent(parent);
+            _t.localPosition = localPosition;
+            _t.localEulerAngles = localEulerAngles;
+            return _t;
+        }
         /// <summary>
         /// Iguala la posicio, rot, escalat d'un transform a un altre.
         /// </summary>

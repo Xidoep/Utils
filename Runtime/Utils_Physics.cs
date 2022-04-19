@@ -86,5 +86,16 @@ namespace XS_Utils
         {
             return Physics.OverlapSphere(centre, radi);
         }
+
+        public static bool Capsule(Vector3 point1, Vector3 point2, float radius, LayerMask layerMask)
+        {
+            if (results == null) results = new Collider[10];
+            return Physics.OverlapCapsuleNonAlloc(point1, point2, radius, results, layerMask) > 0;
+        }
+
+        public static int Capsule(ref Collider[] colliders, Vector3 point1, Vector3 point2, float radius, LayerMask layerMask)
+        {
+            return Physics.OverlapCapsuleNonAlloc(point1, point2, radius, colliders, layerMask);
+        }
     }
 }

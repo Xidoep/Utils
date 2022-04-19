@@ -27,7 +27,17 @@ namespace XS_Utils
         /// <summary>
         /// Starts ans infinite loop with a function that calls every frame.
         /// </summary>
-        public static Coroutine StartCoroutine(Action update)
+        public static Coroutine StartCoroutine_Update(Action update)
+        {
+            Init();
+            return corrutinaEstaticaMonoBehavior.StartCoroutine(LoopCondition_Update(InfiniteLoop, update));
+        }
+        /// <summary>
+        /// Stats an infonite loop with a function that calls every fixed update
+        /// </summary>
+        /// <param name="update"></param>
+        /// <returns></returns>
+        public static Coroutine StartCoroutine_FixedUpdate(Action update)
         {
             Init();
             return corrutinaEstaticaMonoBehavior.StartCoroutine(LoopCondition_Update(InfiniteLoop, update));
@@ -66,6 +76,15 @@ namespace XS_Utils
             {
                 update.Invoke();
                 yield return new WaitForEndOfFrame();
+            }
+            yield return null;
+        }
+        static IEnumerator LoopCondition_FixedUpdate(Func<bool> sortida, Action update)
+        {
+            while (!sortida.Invoke())
+            {
+                update.Invoke();
+                yield return new WaitForFixedUpdate();
             }
             yield return null;
         }

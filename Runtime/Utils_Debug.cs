@@ -19,11 +19,23 @@ namespace XS_Utils
 #else
             if (Debug.isDebugBuild)
             {
-                Debug.LogError(missatge);
+                Debug.Log(missatge);
             }
 #endif
         }
         public static void Log(object missatge) => Log(missatge.ToString());
+        public static void LogError(string missatge)
+        {
+#if UNITY_EDITOR
+            Debug.LogError(missatge);
+#else
+            if (Debug.isDebugBuild)
+            {
+                Debug.LogError(missatge);
+            }
+#endif
+        }
+        public static void LogError(object missatge) => LogError(missatge.ToString());
 
         public static void DrawRay(Vector3 start, Vector3 dir)
         {

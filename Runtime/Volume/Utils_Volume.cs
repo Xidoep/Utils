@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using XS_Utils;
 
-public class Utils_Volume : MonoBehaviour
+public abstract class Utils_Volume : MonoBehaviour
 {
     public enum Types { box, spfere }
 
@@ -11,25 +12,31 @@ public class Utils_Volume : MonoBehaviour
     BoxCollider boxCollider;
     SphereCollider sphereCollider;
 
-    
+    [Tooltip("Multiplies the value sended by the OnAproaching function")] [SerializeField] float multiply = 1;
+    [Tooltip("Set it to true if you want to fire the OnFullyEntereing event every frame")] [SerializeField] bool invokeRepitelly = false;
     [SerializeField] Types types;
     [SerializeField] LayerMask FindedObjectLayer;
     [SerializeField] [Range(0, 30)] float range;
-    [SerializeField] float multiply;
-    [SerializeField] UnityEvent<float> function;
-    [Header("Debug")]
-    [SerializeField] Color color = Color.red;
 
-    bool InOutterVolumen;
+    bool IsIntoOutter;
     Collider[] colliders;
     float value;
+    bool invoke_flanc = false;
     //Vector3 boxSize => Vector3.Scale(boxCollider.size, transform.localScale) + (Vector3.one * (range * 2));
 
-    bool IsIntoInnerVolume => value == 1;
-    bool IsBewteenVolumes => value == Mathf.Clamp01(value);
-    public UnityAction<float> Accio { set => function.AddListener(value); }
-    Vector3 boxSize => transform.localScale;
-    float shpereSize => transform.localScale.magnitude * 0.3f;
+    bool IsIntoInner => value == 1;
+    bool IsBewteen => value == Mathf.Clamp01(value);
+    bool IsCompletelyOut => value < 0;
+    public Types MyTypes => types;
+    public Vector3 BoxSize => transform.localScale;
+    public float ShpereSize => transform.localScale.magnitude * 0.3f;
+    public float Range => range;
+
+    public abstract void OnAproaching(float distance);
+    public abstract void OnFullyEntering();
+    public abstract void OnExit();
+
+
 
     void OnEnable()
     {
@@ -38,30 +45,56 @@ public class Utils_Volume : MonoBehaviour
     }
     void Update()
     {
-        if (!InOutterVolumen)
+        //First check if was market as something inside, if not stops the process.
+        if (!IsIntoOutter)
         {
+            //As nothing is inside, check for near colliders
             if(CheckForColliders(out colliders) > 0)
             {
+                //as soon as it finds one, it starts getting the value distance
                 value = Valor();
-                if (IsIntoInnerVolume)
-                    return;
 
-                if (IsBewteenVolumes) 
-                    InOutterVolumen = true;
+                //If collider founded is fully inside the inner trigger it will fire the events, and will stop here.
+                if (IsIntoInner)
+                {
+                    if (!invokeRepitelly)
+                    {
+                        if (!invoke_flanc)
+                        {
+                            invoke_flanc = true;
+                            OnFullyEntering();
+                        }
+                    }
+                    else OnFullyEntering();
+                    return;
+                }
+
+                //This means that the collider is fully catch, so no longer need to find for more colliders.
+                if (IsBewteen) 
+                    IsIntoOutter = true;
             }
             return;
         }
 
-        if(!IsBewteenVolumes || IsIntoInnerVolume)
-            InOutterVolumen = false;
+        //Chech if collider is out of blending zone.
+        //if it is inside the trigger, it will reestart the cheching for colliders above. To check if the collider is fully inside.
+        if(!IsBewteen || IsIntoInner)
+        {
+            IsIntoOutter = false;
+            if (IsCompletelyOut)
+            {
+                OnExit();
+            }
+        }
 
+        //Fires the funcion only when the value changes.
         if (value != Valor())
         {
             value = Valor();
-            function.Invoke(Mathf.Clamp01(value) * multiply);
+            OnAproaching(Mathf.Clamp01(value) * multiply);
         }
 
-        Debug.DrawLine(colliders[0].transform.position, col.ClosestPoint(colliders[0].transform.position), Color.red * (1 - value) + Color.green * value);
+        Debugar.DrawLine(colliders[0].transform.position, col.ClosestPoint(colliders[0].transform.position), Color.red * (1 - value) + Color.green * value);
     }
 
     int CheckForColliders(out Collider[] colliders)
@@ -70,9 +103,9 @@ public class Utils_Volume : MonoBehaviour
         switch (types)
         {
             case Types.spfere:
-                return Physics.OverlapSphereNonAlloc(transform.position, shpereSize + range, colliders, FindedObjectLayer);
+                return Physics.OverlapSphereNonAlloc(transform.position, ShpereSize + range, colliders, FindedObjectLayer);
             default:
-                return Physics.OverlapBoxNonAlloc(transform.position, boxSize + (Vector3.one * (range * 2)), colliders, transform.rotation, FindedObjectLayer);
+                return Physics.OverlapBoxNonAlloc(transform.position, BoxSize + (Vector3.one * (range * 2)), colliders, transform.rotation, FindedObjectLayer);
         }
     }
 
@@ -113,21 +146,6 @@ public class Utils_Volume : MonoBehaviour
         }
     }
 
-    void OnDrawGizmos()
-    {
-        Gizmos.color = new Color(color.r, color.g, color.b, 0.5f);
-        switch (types)
-        {
-            case Types.spfere:
-                Gizmos.DrawWireSphere(transform.position, shpereSize + range);
-                Gizmos.DrawSphere(transform.position, shpereSize);
-                break;
-            default:
-                Gizmos.DrawWireCube(transform.position, boxSize + (Vector3.one * (range * 2)));
-                Gizmos.DrawCube(transform.position, boxSize);
-                break;
-        }
-        
-    }
+
 
 }

@@ -66,6 +66,7 @@ namespace XS_Utils
 
             return _forward * direccio.y + camara.right * direccio.x;
         }
+        
     }
 
 }
