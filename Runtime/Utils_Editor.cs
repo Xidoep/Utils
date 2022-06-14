@@ -23,6 +23,31 @@ namespace XS_Utils
 #endif
             return null;
         }
+        public static List<T> LoadAllAssetsAtPath<T>(string path) 
+        {
+            List<T> _tmp = new List<T>();
+            foreach (var item in XS_Editor.LoadAllAssetsAtPath(path))
+            {
+                _tmp.Add((T)item);
+            }
+            return _tmp;
+        }
+        public static List<object> LoadAllAssetsAtPath(string folderPath)
+        {
+#if UNITY_EDITOR
+            string[] paths = System.IO.Directory.GetFiles(folderPath);
+            List<object> assets = new List<object>();
+            for (int i = 0; i < paths.Length; i++)
+            {
+                if (!paths[i].Contains(".meta"))
+                {
+                    assets.Add(AssetDatabase.LoadAssetAtPath(paths[i], typeof(Object)));
+                }
+            }
+            return assets;
+#endif
+            return null;
+        }
         public static T LoadGuardat<T>() => (T)LoadAssetAtPath(GUARDAT_PATH, typeof(T));
     }
 }

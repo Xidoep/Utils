@@ -42,6 +42,8 @@ namespace XS_Utils
             Init();
             return corrutinaEstaticaMonoBehavior.StartCoroutine(LoopCondition_Update(InfiniteLoop, update));
         }
+
+
         /// <summary>
         /// Starts a loop with a function as an exit condition and with a function that calls every frame.
         /// </summary>
