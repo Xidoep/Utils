@@ -43,5 +43,10 @@ namespace XS_Utils
         /// It smoothly rotates the given transform to math the given rotation
         /// </summary>
         public static void RotateToQuaternionSmooth(this Transform transform, Quaternion rotation, float speed = 1) => transform.rotation = Quaternion.RotateTowards(transform.rotation, rotation, speed);
+    
+        public static Vector3 RandomRotation(Vector3 vector1, Vector3 vector2)
+        {
+            return new Vector3(Random.Range(vector1.x, vector2.x), Random.Range(vector1.y, vector2.y), Random.Range(vector1.z, vector2.z));
+        }
     }
 }
