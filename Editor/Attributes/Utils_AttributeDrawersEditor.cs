@@ -8,6 +8,64 @@ using UnityEditor;
 using XS_Utils;
 using System.Linq;
 
+//NOTA
+[CustomPropertyDrawer(typeof(NotaAttribute))]
+public class NotaDrawer : DecoratorDrawer
+{
+    const float k_padding = 15f;
+    float m_height = 0f;
+
+    public override float GetHeight()
+    {
+        NotaAttribute noteAttribute = attribute as NotaAttribute;
+
+        GUIStyle style = EditorStyles.helpBox;
+        style.alignment = TextAnchor.MiddleLeft;
+        style.wordWrap = true;
+        style.padding = new RectOffset(5, 5, 3, 3);
+        style.fontSize = 12;
+
+        m_height = style.CalcHeight(new GUIContent(noteAttribute.Text), Screen.width - 45);
+
+        return m_height + k_padding;
+    }
+
+    public override void OnGUI(Rect position)
+    {
+        NotaAttribute noteAttribute = attribute as NotaAttribute;
+
+        position.height = m_height;
+        position.y += k_padding * .8f;
+        EditorGUI.HelpBox(position, noteAttribute.Text, (MessageType)noteAttribute.NoteType);
+    }
+}
+
+//LINE
+[CustomPropertyDrawer(typeof(LiniaAttribute))]
+public class LiniaDrawer : DecoratorDrawer
+{
+    public override float GetHeight()
+    {
+        LiniaAttribute attr = attribute as LiniaAttribute;
+        return Mathf.Max(attr.Padding, attr.Thickness);
+    }
+
+    public override void OnGUI(Rect position)
+    {
+        base.OnGUI(position);
+        {
+            LiniaAttribute attr = attribute as LiniaAttribute;
+
+            position.height = attr.Thickness;
+            position.y += attr.Padding * .87f;
+
+            EditorGUI.DrawRect(position, new Color(.3f, .3f, .3f, 1f));
+        }
+    }
+}
+
+
+//INFORMACIO
 [CustomPropertyDrawer(typeof(InformacioAttribute))]
 public class InformacioDrawer : PropertyDrawer
 {
