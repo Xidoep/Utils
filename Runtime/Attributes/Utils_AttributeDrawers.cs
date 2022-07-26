@@ -27,6 +27,18 @@ public class LiniaAttribute : PropertyAttribute
     public LiniaAttribute() { }
 }
 
+//APARTAT
+public class ApartatAttribute : PropertyAttribute
+{
+    public int Thickness = 20;
+    public float Padding = 50;
+    public string Text = string.Empty;
+
+    public ApartatAttribute(string text) 
+    {
+        Text = text;
+    }
+}
 
 //INFORMACIO
 public class InformacioAttribute : PropertyAttribute

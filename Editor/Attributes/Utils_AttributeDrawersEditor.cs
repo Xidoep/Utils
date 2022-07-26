@@ -64,6 +64,41 @@ public class LiniaDrawer : DecoratorDrawer
     }
 }
 
+//APARTAT
+[CustomPropertyDrawer(typeof(ApartatAttribute))]
+public class ApartatDrawer : DecoratorDrawer
+{
+    public override float GetHeight()
+    {
+        ApartatAttribute attr = attribute as ApartatAttribute;
+        return Mathf.Max(attr.Padding, attr.Thickness);
+    }
+
+    public override void OnGUI(Rect position)
+    {
+        base.OnGUI(position);
+        {
+            ApartatAttribute attr = attribute as ApartatAttribute;
+
+            position.height = 4;
+            position.y += attr.Padding * .4f;
+
+            EditorGUI.DrawRect(position, new Color(.3f, .3f, .3f, 1f));
+
+            position.height = attr.Thickness;
+            position.y += attr.Padding * .15f;
+
+            GUIStyle style = EditorStyles.boldLabel;
+            style.alignment = TextAnchor.MiddleLeft;
+            style.wordWrap = false;
+            style.padding = new RectOffset(5, 5, 3, 3);
+            style.fontSize = 12;
+
+            EditorGUI.LabelField(position, attr.Text, style);
+        }
+    }
+}
+
 
 //INFORMACIO
 [CustomPropertyDrawer(typeof(InformacioAttribute))]
