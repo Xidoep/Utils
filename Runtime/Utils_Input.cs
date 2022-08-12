@@ -12,13 +12,18 @@ namespace XS_Utils
         /// </summary>
         public static bool OnPress(this Key key) => Keyboard.current[key].wasPressedThisFrame;
         public static bool GetBool(this InputActionReference inputActionReference) => inputActionReference.action.ReadValue<float>() > 0.1f;
+        public static bool GetBool(this InputAction.CallbackContext context) => context.ReadValue<float>() > 0.1f;
 
-        public static bool IsFloatZero(this InputActionReference inputActionReference) => inputActionReference.action.ReadValue<float>() == 0;
+        public static bool IsZero_Float(this InputActionReference inputActionReference) => inputActionReference.action.ReadValue<float>() == 0;
+        public static bool IsZero_Float(this InputAction.CallbackContext context) => context.ReadValue<float>() == 0;
         public static float GetFloat(this InputActionReference inputActionReference) => inputActionReference.action.ReadValue<float>();
-        
-        public static bool IsVector2Zero(this InputActionReference inputActionReference) => inputActionReference.action.ReadValue<Vector2>() == Vector2.zero;
+        public static float GetFloat(this InputAction.CallbackContext context) => context.ReadValue<float>();
+
+        public static bool IsZero_Vector2(this InputActionReference inputActionReference) => inputActionReference.action.ReadValue<Vector2>() == Vector2.zero;
+        public static bool IsZero_Vector2(this InputAction.CallbackContext context) => context.ReadValue<Vector2>() == Vector2.zero;
         public static Vector2 GetVector2(this InputActionReference inputActionReference) => inputActionReference.action.ReadValue<Vector2>();
-        
+        public static Vector2 GetVector2(this InputAction.CallbackContext context) => context.ReadValue<Vector2>();
+
         public static void OnPerformedAdd(this InputActionReference inputActionReference, Action<InputAction.CallbackContext> action) => inputActionReference.action.performed += action;
         public static void OnPerformedRemove(this InputActionReference inputActionReference, Action<InputAction.CallbackContext> action) => inputActionReference.action.performed -= action;
         public static bool ComparePath(this InputBinding inputBinding, string path) => inputBinding.PathOrOverridePath() == path;
