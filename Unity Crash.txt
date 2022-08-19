@@ -1,0 +1,15 @@
+When unity crashes.
+
+1.- Before open your project...
+
+2.- Go to "UnityProject"/Temp/_Backupscenes.
+
+3.- Then find the most resent file like: 0.backup
+
+    This is a backup of your scene.
+
+4.- Rename it to something like this: myBackupSceneThatCrashed.unity
+
+5.- Bring it back to your asset's folder.
+
+6.- After that, open your project and open your this scene, to recover the scene as it was before the crash.
