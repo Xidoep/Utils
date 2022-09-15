@@ -69,7 +69,11 @@ namespace XS_Utils
             waitForSecondsRealtime = new WaitForSecondsRealtime(time);
             return corrutinaEstaticaMonoBehavior.StartCoroutine(LoopTime(ending));
         }
-
+        public static Coroutine StartCoroutine_EndFrame(Action ending)
+        {
+            Init();
+            return corrutinaEstaticaMonoBehavior.StartCoroutine(LoopEndOfFrame(ending));
+        }
 
 
         static IEnumerator LoopCondition_Update(Func<bool> sortida, Action update)
@@ -104,7 +108,11 @@ namespace XS_Utils
             yield return waitForSecondsRealtime;
             ending.Invoke();
         }
-
+        static IEnumerator LoopEndOfFrame(Action ending)
+        {
+            yield return new WaitForEndOfFrame();
+            ending.Invoke();
+        }
 
 
         public static void StopCoroutine(this Coroutine coroutine, bool destroyCoroutine = true)
