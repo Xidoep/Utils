@@ -13,4 +13,16 @@ public class XS_Button : Button
     public UnityEvent onExit;
 
     public void Interactable(bool interactable) => this.interactable = interactable;
+
+    public override void OnPointerEnter(PointerEventData eventData)
+    {
+        base.OnPointerEnter(eventData);
+        onEnter.Invoke();
+    }
+    public override void OnPointerExit(PointerEventData eventData)
+    {
+        base.OnPointerExit(eventData);
+        onExit.Invoke();
+    }
+
 }
