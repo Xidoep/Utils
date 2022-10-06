@@ -23,7 +23,11 @@ namespace XS_Utils
 
 
 
-
+        public static Coroutine StartCoroutine(IEnumerator coroutine)
+        {
+            Init();
+            return corrutinaEstaticaMonoBehavior.StartCoroutine(coroutine);
+        }
         /// <summary>
         /// Starts ans infinite loop with a function that calls every frame.
         /// </summary>
