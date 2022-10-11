@@ -15,6 +15,7 @@ public class Utils_Destruir : MonoBehaviour
         Destruir(temps);
     }
 
+    public void Destruir() => Destruir(temps);
     public void Destruir(float temps)
     {
         Destroy(gameObject, temps);
