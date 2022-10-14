@@ -2,7 +2,8 @@
     "name": "XS.UtilsEditor",
     "rootNamespace": "",
     "references": [
-        "GUID:37e030ce89aa5244da079dc58a0a15f8"
+        "GUID:37e030ce89aa5244da079dc58a0a15f8",
+        "GUID:6546d7765b4165b40850b3667f981c26"
     ],
     "includePlatforms": [
         "Editor"
