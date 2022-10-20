@@ -155,6 +155,8 @@ namespace XS_Utils
     public static class XS_InstantiateGPU
     {
         const int MAX_GRAPHICS_PER_BUFFER = 2;
+
+        [System.Serializable]
         public class Grafic
         {
             public Mesh mesh;
@@ -178,11 +180,11 @@ namespace XS_Utils
             created = MonoBehaviour.Instantiate(gameObject);
            
 
-            AddGrafics(gameObject);
+            AddGrafics(created, grafics);
             return created;
         }
 
-        public static void AddGrafics(this GameObject gameObject)
+        public static void AddGrafics(this GameObject gameObject, List<Grafic> grafics)
         {
             if (grafics == null) grafics = new List<Grafic>();
             MeshFilter[] meshFilters = gameObject.GetComponentsInChildren<MeshFilter>();
@@ -265,7 +267,7 @@ namespace XS_Utils
             //XS_Coroutine.StartCoroutine_Ending(StopRendering, () => rendering = false);
         }
 
-        public static void RenderUpdate()
+        public static void RenderUpdate(List<Grafic> grafics)
         {
             debug = $"Rendering = {rendering}\n";
             
