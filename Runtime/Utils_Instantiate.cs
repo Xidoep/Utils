@@ -154,75 +154,80 @@ namespace XS_Utils
 
     public static class XS_InstantiateGPU
     {
-        const int MAX_GRAPHICS_PER_BUFFER = 2;
+        const int MAX_GRAPHICS_PER_BUFFER = 1000;
 
         [System.Serializable]
         public class Grafic
         {
             public Mesh mesh;
-            public Material material;
-            public List<GameObject> elements;
+            public Material[] materials;
+            public List<MeshRenderer> elements;
             public Matrix4x4[] matrix4X4s; 
         }
+
         public static List<Grafic> grafics;
 
-
         //INTERN
-        static bool rendering;
-
-        static GameObject created;
-        static int matched;
+        static int index;
         static MeshRenderer meshRenderer;
-        static string debug;
+        static bool matched;
 
-        public static GameObject Instantiate(GameObject gameObject) 
+        public static void AddGrafics(this GameObject gameObject)
         {
-            created = MonoBehaviour.Instantiate(gameObject);
-           
 
-            AddGrafics(created, grafics);
-            return created;
-        }
-
-        public static void AddGrafics(this GameObject gameObject, List<Grafic> grafics)
-        {
             if (grafics == null) grafics = new List<Grafic>();
             MeshFilter[] meshFilters = gameObject.GetComponentsInChildren<MeshFilter>();
 
             for (int mf = 0; mf < meshFilters.Length; mf++)
             {
-                matched = -1;
+                index = -1;
                 meshRenderer = meshFilters[mf].GetComponent<MeshRenderer>();
                 for (int g = 0; g < grafics.Count; g++)
                 {
-                    
                     if(grafics[g].elements.Count <= MAX_GRAPHICS_PER_BUFFER && 
-                        grafics[g].mesh == meshFilters[mf].sharedMesh && 
-                        grafics[g].material == meshRenderer.sharedMaterial)
+                        grafics[g].mesh == meshFilters[mf].sharedMesh)
                     {
-                        matched = g;
-                        break;
+                        if (grafics[g].materials.Length != meshRenderer.sharedMaterials.Length)
+                            continue;
+
+                        matched = true;
+                        for (int m = 0; m < meshRenderer.sharedMaterials.Length; m++)
+                        {
+                            if (grafics[g].materials[m] != meshRenderer.sharedMaterials[m])
+                            {
+                                matched = false;
+                                break;
+                            }
+                        }
+
+                        if (matched)
+                        {
+                            index = g;
+                            break;
+                        }
                     }
                 }
 
-                if (matched == -1)
+                if (index == -1)
                 {
                     grafics.Add(new Grafic()
                     {
                         mesh = meshFilters[mf].sharedMesh,
-                        material = meshRenderer.sharedMaterial,
-                        elements = new List<GameObject>() { gameObject },
-                        matrix4X4s = new Matrix4x4[] { Matrix4x4.TRS(gameObject.transform.position, gameObject.transform.rotation, gameObject.transform.localScale) }
+                        //material = meshRenderer.sharedMaterial,
+                        materials = meshRenderer.sharedMaterials,
+                        elements = new List<MeshRenderer>() { meshRenderer },
+                        matrix4X4s = new Matrix4x4[] { Matrix4x4.TRS(meshFilters[mf].transform.position, meshFilters[mf].transform.rotation, meshFilters[mf].transform.localScale) }
                         //elements = new List<GameObject>() { new Grafic.Element() {element = gameObject, matrix4X4 = Matrix4x4.TRS(gameObject.transform.position, gameObject.transform.rotation, gameObject.transform.localScale) } }
                         //matrix4X4s = new List<Matrix4x4>() { Matrix4x4.TRS(gameObject.transform.position, gameObject.transform.rotation, gameObject.transform.localScale) }
                     });
                 }
                 else
                 {
-                    grafics[matched].elements.Add(gameObject);
-                    List<Matrix4x4> tmp = new List<Matrix4x4>(grafics[matched].matrix4X4s);
-                    tmp.Add(Matrix4x4.TRS(gameObject.transform.position, gameObject.transform.rotation, gameObject.transform.localScale));
-                    grafics[matched].matrix4X4s = tmp.ToArray();
+                    grafics[index].elements.Add(meshRenderer);
+                    List<Matrix4x4> tmp = new List<Matrix4x4>(grafics[index].matrix4X4s);
+                    tmp.Add(Matrix4x4.TRS(meshFilters[mf].transform.position, meshFilters[mf].transform.rotation, meshFilters[mf].transform.localScale));
+                    grafics[index].matrix4X4s = tmp.ToArray();
+                    
                     //grafics[matched].elements.Add(new Grafic.Element() { element = gameObject, matrix4X4 = Matrix4x4.TRS(gameObject.transform.position, gameObject.transform.rotation, gameObject.transform.localScale) });
                     //grafics[graficMatched].matrix4X4s.Add(Matrix4x4.TRS(gameObject.transform.position, gameObject.transform.rotation, gameObject.transform.localScale));
                 }
@@ -231,27 +236,28 @@ namespace XS_Utils
             }
         }
 
-        public static void RemoveGrafic(this GameObject gameObject)
+        public static void RemoveGrafic(this GameObject gameObject) => RemoveGrafic(gameObject.GetComponentsInChildren<MeshRenderer>());
+
+        public static void RemoveGrafic(MeshRenderer[] meshRenderers)
         {
             for (int g = 0; g < grafics.Count; g++)
             {
-                for (int e = 0; e < grafics[g].elements.Count; e++)
+                for (int mr = 0; mr < meshRenderers.Length; mr++)
                 {
-                    if(grafics[g].elements[e] == gameObject)
+                    if (grafics[g].elements.Contains(meshRenderers[mr]))
                     {
-                        grafics[g].elements.RemoveAt(e);
                         List<Matrix4x4> tmp = new List<Matrix4x4>(grafics[g].matrix4X4s);
-                        tmp.RemoveAt(e);
+                        tmp.RemoveAt(grafics[g].elements.IndexOf(meshRenderers[mr]));
                         grafics[g].matrix4X4s = tmp.ToArray();
 
-                        gameObject.GetComponent<MeshRenderer>().enabled = true;
-                        break;
+                        grafics[g].elements.Remove(meshRenderers[mr]);
+
+                        meshRenderers[mr].enabled = true;
                     }
                 }
             }
+
         }
-
-
 
 
 
@@ -262,31 +268,16 @@ namespace XS_Utils
 
         public static void Render()
         {
-            //rendering = true;
-            //XS_Coroutine.StartCoroutine_Update(StopRendering, RenderUpdate);
-            //XS_Coroutine.StartCoroutine_Ending(StopRendering, () => rendering = false);
-        }
+            if (grafics == null)
+                return;
 
-        public static void RenderUpdate(List<Grafic> grafics)
-        {
-            debug = $"Rendering = {rendering}\n";
-            
-            for (int i = 0; i < grafics.Count; i++)
+            for (int g = 0; g < grafics.Count; g++)
             {
-                debug += "--------------------------------\n";
-                debug += grafics[i].mesh.name + "\n";
-                debug += grafics[i].material.name + "\n";
-                for (int x = 0; x < grafics[i].elements.Count; x++)
+                for (int m = 0; m < grafics[g].materials.Length; m++)
                 {
-                    debug += grafics[i].elements[x].name + "\n";
-                    debug += new Vector3(grafics[i].matrix4X4s[x].m03, grafics[i].matrix4X4s[x].m13, grafics[i].matrix4X4s[x].m23) + "\n";
+                    Graphics.DrawMeshInstanced(grafics[g].mesh, m, grafics[g].materials[m], grafics[g].matrix4X4s);
                 }
-                Graphics.DrawMeshInstanced(grafics[i].mesh, 0, grafics[i].material, grafics[i].matrix4X4s);
             }
-
-            Debugar.Log(debug);
-            
         }
-        static bool StopRendering() => !Application.isPlaying;
     }
 }
