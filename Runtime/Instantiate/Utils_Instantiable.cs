@@ -6,6 +6,8 @@ using XS_Utils;
 
 public class Utils_Instantiable : MonoBehaviour
 {
+    [Nota("Posa aquest script a l'element del projecet que vulguis instanciar. Així només cal que el referenciis desde un boto.")]
+
     Vector3 position;
     Quaternion rotation;
 

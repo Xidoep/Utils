@@ -174,7 +174,7 @@ namespace XS_Utils
 
         public static void AddGrafics(this GameObject gameObject)
         {
-            //return;
+            return;
 
             if (grafics == null) grafics = new List<Grafic>();
             MeshFilter[] meshFilters = gameObject.GetComponentsInChildren<MeshFilter>();
@@ -241,7 +241,7 @@ namespace XS_Utils
 
         public static void RemoveGrafic(MeshRenderer[] meshRenderers)
         {
-            //return;
+            return;
 
             for (int g = 0; g < grafics.Count; g++)
             {
