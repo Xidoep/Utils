@@ -26,6 +26,7 @@ namespace XS_Utils
 
             Func<Vector3> position;
             Func<Quaternion> rotation;
+            Func<Vector3> scale;
             Action<GameObject> onRelease;
             Transform parent;
 
@@ -45,6 +46,14 @@ namespace XS_Utils
                     else return Quaternion.identity;
                 }
             }
+            Vector3 Scale
+            {
+                get
+                {
+                    if (scale != null) return scale.Invoke();
+                    else return Vector3.one;
+                }
+            }
 
             /// <summary>
             /// It creates the Pool passing the functions needed to polled from pool.
@@ -61,6 +70,17 @@ namespace XS_Utils
                 pool = new ObjectPool<GameObject>(Crear, OnPoolGet, OnPoolRelease);
                 initializated = true;
             }
+            void Initialize(GameObject _original, Func<Vector3> _position, Func<Quaternion> _rotation, Func<Vector3> _scale, Transform _parent)
+            {
+                original = _original;
+                position = _position;
+                rotation = _rotation;
+                scale = _scale;
+                onRelease += Release;
+                parent = _parent;
+                pool = new ObjectPool<GameObject>(Crear, OnPoolGet, OnPoolRelease);
+                initializated = true;
+            }
 
             /// <summary>
             /// It's the main function to pull (or create) objects from Pool.
@@ -69,6 +89,11 @@ namespace XS_Utils
             public GameObject Get(GameObject _original, Func<Vector3> _position, Func<Quaternion> _rotation, Transform _parent)
             {
                 if (!initializated) Initialize(_original, _position, _rotation, _parent);
+                return pool.Get();
+            }
+            public GameObject Get(GameObject _original, Func<Vector3> _position, Func<Quaternion> _rotation, Func<Vector3> _scale, Transform _parent)
+            {
+                if (!initializated) Initialize(_original, _position, _rotation, _scale, _parent);
                 return pool.Get();
             }
             /// <summary>
@@ -80,6 +105,15 @@ namespace XS_Utils
                 {
                     onRelease += _onRelease;
                     Initialize(_original, _position, _rotation, _parent);
+                }
+                return pool.Get();
+            }
+            public GameObject Get(GameObject _original, Func<Vector3> _position, Func<Quaternion> _rotation, Func<Vector3> _scale, Action<GameObject> _onRelease, Transform _parent)
+            {
+                if (!initializated)
+                {
+                    onRelease += _onRelease;
+                    Initialize(_original, _position, _rotation, _scale, _parent);
                 }
                 return pool.Get();
             }
@@ -104,6 +138,7 @@ namespace XS_Utils
             {
                 _pooledObject.transform.position = Position;
                 _pooledObject.transform.rotation = Rotation;
+                _pooledObject.transform.localScale = Scale;
                 _pooledObject.transform.SetParent(parent);
                 _pooledObject.gameObject.SetActive(true);
             }
@@ -143,11 +178,34 @@ namespace XS_Utils
             if (!pools.ContainsKey(original)) pools.Add(original, new Pool());
             return pools[original].Get(original, position, rotation, parent).gameObject;
         }
+        public static GameObject Instantiate(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation, Func<Vector3> scale, Transform parent)
+        {
+            if (pools == null) pools = new Dictionary<GameObject, Pool>();
+            if (!pools.ContainsKey(original)) pools.Add(original, new Pool());
+            return pools[original].Get(original, position, rotation, scale, parent).gameObject;
+        }
         public static GameObject Instantiate(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation, Action<GameObject> onRelease, Transform parent)
         {
             if (pools == null) pools = new Dictionary<GameObject, Pool>();
             if (!pools.ContainsKey(original)) pools.Add(original, new Pool());
-            return pools[original].Get(original, position, rotation, parent).gameObject;
+            return pools[original].Get(original, position, rotation, onRelease, parent).gameObject;
+        }
+        public static GameObject Instantiate(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation, Func<Vector3> scale, Action<GameObject> onRelease, Transform parent)
+        {
+            if (pools == null) pools = new Dictionary<GameObject, Pool>();
+            if (!pools.ContainsKey(original)) pools.Add(original, new Pool());
+            return pools[original].Get(original, position, rotation, scale, onRelease, parent).gameObject;
+        }
+    }
+
+    public static class XS_Instantiate
+    {
+        static GameObject gameObject;
+        public static GameObject Instantiate(this GameObject original, Vector3 position, Quaternion rotation, Vector3 scale, Transform parent) 
+        {
+            gameObject = MonoBehaviour.Instantiate(original, position, rotation, parent);
+            gameObject.transform.localScale = scale;
+            return gameObject;
         }
     }
 }
