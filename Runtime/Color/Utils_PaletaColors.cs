@@ -13,6 +13,50 @@ public class Utils_PaletaColors : MonoBehaviour
     [Space(10)]
     [Range(0.05f, 0.25f)] public float separacio = 0.1f;
 
+    [Apartat("Mostra")]
+    [Header("Contraris")]
+    [SerializeField] Color conPrincipal;
+    [SerializeField] Color contrari;
+    [Header("Adjacents")]
+    [SerializeField] Color adjUp;
+    [SerializeField] Color adjPrincipal;
+    [SerializeField] Color adjDown;
+    [Header("Triangle")]
+    [SerializeField] Color triUp;
+    [SerializeField] Color triPrincipal;
+    [SerializeField] Color triDown;
+    [Header("Quadrat")]
+    [SerializeField] Color qua1;
+    [SerializeField] Color qua2;
+    [SerializeField] Color qua3;
+    [SerializeField] Color qua4;
+
+    private void OnValidate()
+    {
+        if (Application.isPlaying)
+            return;
+
+        Color[] colors = Contraris();
+        conPrincipal = colors[0];
+        contrari = colors[1];
+
+        colors = Adjacents();
+        adjPrincipal = colors[0];
+        adjUp = colors[1];
+        adjDown = colors[2];
+
+        colors = Tris();
+        triPrincipal = colors[0];
+        triUp = colors[1];
+        triDown = colors[2];
+
+        colors = Tetras();
+        qua1 = colors[0];
+        qua2 = colors[1];
+        qua3 = colors[2];
+        qua4 = colors[3];
+    }
+
     //PROPIETATS
     public Color Color
     {
@@ -68,7 +112,7 @@ public class Utils_PaletaColors : MonoBehaviour
     /// Retorna 3 colors. 
     /// [0]principal, [1]complementarisD, [2]complementarisE.
     /// </summary>
-    public Color[] GetTris()
+    public Color[] Tris()
     {
         return new Color[]
             {
@@ -82,7 +126,7 @@ public class Utils_PaletaColors : MonoBehaviour
     /// Retorna 4 colors. 
     /// [0]adjacentsD, [1]adjacentsE, [2]complementarisD, [3]complementarisE.
     /// </summary>
-    public Color[] GetTetras()
+    public Color[] Tetras()
     {
         return new Color[]
             {
@@ -109,7 +153,7 @@ public class Utils_PaletaColors : MonoBehaviour
            };
     }
 
-    public Color Principal()
+    Color Principal()
     {
         Vector3 hsv = HSV;
         return Color.HSVToRGB(
@@ -117,7 +161,7 @@ public class Utils_PaletaColors : MonoBehaviour
             hsv.y + Random.Range(-randomSaturacio, +randomSaturacio),
             hsv.z + Random.Range(-randomIluminacio, +randomIluminacio), true);
     }
-    public Color Adjacent(bool Dreta, bool segon = false)
+    Color Adjacent(bool Dreta, bool segon = false)
     {
         Vector3 hsv = HSV;
         return Color.HSVToRGB(
@@ -125,7 +169,7 @@ public class Utils_PaletaColors : MonoBehaviour
             hsv.y + Random.Range(-randomSaturacio, +randomSaturacio),
             hsv.z + Random.Range(-randomIluminacio, +randomIluminacio), true);
     }
-    public Color Complementari()
+    Color Complementari()
     {
         Vector3 hsv = HSV;
         return Color.HSVToRGB(
@@ -133,7 +177,7 @@ public class Utils_PaletaColors : MonoBehaviour
             hsv.y + Random.Range(-randomSaturacio, +randomSaturacio),
             hsv.z + Random.Range(-randomIluminacio, +randomIluminacio), true);
     }
-    public Color Complementari(bool Dreta, bool segon = false)
+    Color Complementari(bool Dreta, bool segon = false)
     {
         Vector3 hsv = HSV;
         return Color.HSVToRGB(
