@@ -4,6 +4,9 @@ using UnityEngine;
 
 public class Utils_EsdevenimentDelegat : MonoBehaviour
 {
+    //Eina per poder registrar events d'un altre script sense haver de referenciar-lo en un segon script.
+    //Ex: Un boto d'un Popup dinamic: Registres la funcio aqui i referencies Esdevenir() desde el prefab del Popup.
+
     System.Action esdeveniment;
 
     public void Esdevenir() => esdeveniment?.Invoke();

@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Utils_InstantiableFromProject : MonoBehaviour
 {
-    //[Nota("Posa aquest script a l'element del projecet que vulguis instanciar. Així només cal que el referenciis desde un boto.")]
-
+    //Posa aquest script a l'element del projecet que vulguis instanciar. Així només cal que el referenciis desde un boto
+    //Així es poden instanciar gameobjects desde botons, o desde scripts més facilment.
 
     public void Instantiate() => InstantiateReturn();
     public GameObject InstantiateReturn() => Instantiate(gameObject);
