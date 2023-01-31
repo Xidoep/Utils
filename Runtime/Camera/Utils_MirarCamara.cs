@@ -7,20 +7,15 @@ using XS_Utils;
 public class Utils_MirarCamara : MonoBehaviour
 {
     [Informacio] public string Info = "Agafa la mateixa rotacio que la 'Main Camera'";
-    Camera cam;
-
-    private void Awake()
-    {
-        if (cam == null) cam = Camera.main;
-    }
 
     void OnEnable()
     {
-        if(cam == null) cam = Camera.main;
+        if(Utils_MainCamera_Acces.Camera == null)
+            Debugar.LogError("[Utils_MirarCamera] Falta un (Utils_MainCamera_Acces)");
     }
 
     void Update()
     {
-        transform.LookAtTarget(cam.gameObject);
+        transform.LookAtTarget(Utils_MainCamera_Acces.Camera.gameObject);
     }
 }
