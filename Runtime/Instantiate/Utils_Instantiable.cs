@@ -16,13 +16,13 @@ public class Utils_Instantiable : MonoBehaviour
 
 
 
-    public void Instantiate() => gameObject.Instantiate();
+    public void Instantiate() => gameObject.InstantiatePool();
 
     public void Instantiate(Vector3 position)
     {
         this.position = position;
 
-        gameObject.Instantiate(Position);
+        gameObject.InstantiatePool(Position);
     }
 
     public void Instantiate(Vector3 position, Quaternion rotation)
@@ -30,7 +30,7 @@ public class Utils_Instantiable : MonoBehaviour
         this.position = position;
         this.rotation = rotation;
 
-        gameObject.Instantiate(Position, Rotation);
+        gameObject.InstantiatePool(Position, Rotation);
     }
 
     public void Instantiate(Vector3 position, Quaternion rotation, Transform transform)
@@ -38,13 +38,13 @@ public class Utils_Instantiable : MonoBehaviour
         this.position = position;
         this.rotation = rotation;
 
-        gameObject.Instantiate(Position, Rotation, transform);
+        gameObject.InstantiatePool(Position, Rotation, transform);
     }
     public void Instantiate(Vector3 position, Quaternion rotation, float uniformScale)
     {
         this.position = position;
         this.rotation = rotation;
 
-        gameObject.Instantiate(Position, Rotation).transform.localScale = Vector3.one * uniformScale;
+        gameObject.InstantiatePool(Position, Rotation).transform.localScale = Vector3.one * uniformScale;
     }
 }

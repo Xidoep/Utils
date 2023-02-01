@@ -5,6 +5,7 @@ using UnityEngine.UI;
 using UnityEditor;
 using UnityEditor.UI;
 
+
 [CustomEditor(typeof(XS_Button))]
 [CanEditMultipleObjects]
 public class XS_ButtonEditor : ButtonEditor
@@ -30,4 +31,14 @@ public class XS_ButtonEditor : ButtonEditor
 
         serializedObject.ApplyModifiedProperties();
     }
+
+    /*[MenuItem("GameObject/UI/X_Button",priority = 100)]
+    public static void Crear()
+    {
+        var newButton = DefaultControls.CreateButton(new DefaultControls.Resources());
+        DestroyImmediate(newButton.GetComponent<Button>());
+        newButton.AddComponent<XS_Button>();
+    }*/
 }
+
+

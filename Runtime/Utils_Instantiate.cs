@@ -6,7 +6,7 @@ using UnityEngine.Pool;
 
 namespace XS_Utils
 {
-    public static class XS_InstantiatePool
+    public static class XS_Instantiate
     {
         /// <summary>
         /// Instantiate objects using the Pooling system
@@ -16,7 +16,7 @@ namespace XS_Utils
         //If the dictionary already contains de prefab we want to create, it takes the Pool refered instead of creating a new one
         static Dictionary<GameObject, Pool> pools;
 
-        public class Pool
+        class Pool
         {
             bool initializated = false;
             ObjectPool<GameObject> pool;
@@ -169,43 +169,50 @@ namespace XS_Utils
         }
         #endregion
 
-        public static GameObject Instantiate(this GameObject original) => Instantiate(original, null, null, null);
-        public static GameObject Instantiate(this GameObject original, Func<Vector3> position) => original.Instantiate(position, null, null);
-        public static GameObject Instantiate(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation) => original.Instantiate(position, rotation, null);
-        public static GameObject Instantiate(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation, Transform parent)
+        public static GameObject InstantiatePool(this GameObject original) => InstantiatePool(original, null, null, null);
+        public static GameObject InstantiatePool(this GameObject original, Func<Vector3> position) => original.InstantiatePool(position, null, null);
+        public static GameObject InstantiatePool(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation) => original.InstantiatePool(position, rotation, null);
+        public static GameObject InstantiatePool(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation, Transform parent)
         {
             if (pools == null) pools = new Dictionary<GameObject, Pool>();
             if (!pools.ContainsKey(original)) pools.Add(original, new Pool());
             return pools[original].Get(original, position, rotation, parent).gameObject;
         }
-        public static GameObject Instantiate(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation, Func<Vector3> scale, Transform parent)
+        public static GameObject InstantiatePool(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation, Func<Vector3> scale, Transform parent)
         {
             if (pools == null) pools = new Dictionary<GameObject, Pool>();
             if (!pools.ContainsKey(original)) pools.Add(original, new Pool());
             return pools[original].Get(original, position, rotation, scale, parent).gameObject;
         }
-        public static GameObject Instantiate(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation, Action<GameObject> onRelease, Transform parent)
+        public static GameObject InstantiatePool(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation, Action<GameObject> onRelease, Transform parent)
         {
             if (pools == null) pools = new Dictionary<GameObject, Pool>();
             if (!pools.ContainsKey(original)) pools.Add(original, new Pool());
             return pools[original].Get(original, position, rotation, onRelease, parent).gameObject;
         }
-        public static GameObject Instantiate(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation, Func<Vector3> scale, Action<GameObject> onRelease, Transform parent)
+        public static GameObject InstantiatePool(this GameObject original, Func<Vector3> position, Func<Quaternion> rotation, Func<Vector3> scale, Action<GameObject> onRelease, Transform parent)
         {
             if (pools == null) pools = new Dictionary<GameObject, Pool>();
             if (!pools.ContainsKey(original)) pools.Add(original, new Pool());
             return pools[original].Get(original, position, rotation, scale, onRelease, parent).gameObject;
         }
-    }
 
-    public static class XS_Instantiate
-    {
+
+
+
         static GameObject gameObject;
-        public static GameObject Instantiate(this GameObject original, Vector3 position, Quaternion rotation, Vector3 scale, Transform parent) 
+        public static GameObject Instantiate(this GameObject _gameObject, Vector3 position, Quaternion rotation, Vector3 scale, Transform parent)
         {
-            gameObject = MonoBehaviour.Instantiate(original, position, rotation, parent);
+            gameObject = MonoBehaviour.Instantiate(_gameObject, position, rotation, parent);
+            gameObject.transform.localScale = scale;
+            return gameObject;
+        }
+        public static GameObject Instantiate(this UnityEngine.Object myObject, Vector3 position, Quaternion rotation, Vector3 scale, Transform parent)
+        {
+            gameObject = (GameObject)MonoBehaviour.Instantiate(myObject, position, rotation, parent);
             gameObject.transform.localScale = scale;
             return gameObject;
         }
     }
+
 }
