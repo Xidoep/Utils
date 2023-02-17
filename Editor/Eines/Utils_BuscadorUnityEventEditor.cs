@@ -142,7 +142,6 @@ public class Utils_BuscadorUnityEventEditor : EditorWindow
             
         }
         
-        
     }
 
     void AfegirElement(GameObject gameObject, string funcio)

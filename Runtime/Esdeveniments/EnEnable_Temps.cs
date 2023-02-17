@@ -9,7 +9,7 @@ public class EnEnable_Temps : MonoBehaviour
     [SerializeField] float temps;
     [SerializeField] UnityEvent esdeveniment;
 
-
+    public UnityEvent Esdeveniment => esdeveniment;
 
     private void OnEnable() => XS_Coroutine.StartCoroutine_Ending(temps, Invocar);
 
