@@ -14,4 +14,14 @@ public class Utils_EsdevenimentDelegat : MonoBehaviour
     public void Registrar(System.Action accio) => esdeveniment += accio;
     public void Desregistrar(System.Action accio) => esdeveniment -= accio;
 
+    public void Registrar(System.Action accio1, System.Action accio2) 
+    {
+        Registrar(accio1);
+        Registrar(accio2);
+    }
+    public void Desregistrar(System.Action accio1, System.Action accio2) 
+    {
+        Desregistrar(accio1);
+        Desregistrar(accio2);
+    } 
 }
