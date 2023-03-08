@@ -6,6 +6,10 @@ namespace XS_Utils
 {
     public static class XS_Input
     {
+        public static string KEY_2DVECTOR = "2DVector";
+        public static string KEY_1DVECTOR = "1DAxis";
+
+        static bool debug = true;
         /// <summary>
         /// Is listening the given key of the InputSystem and returns TRUE at the frame it is pressed. Otherwise it returns FALSE.
         /// It needs "using UnityEngine.InputSystem;" to refere to Key.
@@ -26,17 +30,55 @@ namespace XS_Utils
 
         public static void OnPerformedAdd(this InputActionReference inputActionReference, Action<InputAction.CallbackContext> action) => inputActionReference.action.performed += action;
         public static void OnPerformedRemove(this InputActionReference inputActionReference, Action<InputAction.CallbackContext> action) => inputActionReference.action.performed -= action;
-        public static bool ComparePath(this InputBinding inputBinding, string path) => inputBinding.PathOrOverridePath() == path;
+        public static bool ComparePath(this InputBinding inputBinding, string path, bool overrided) => inputBinding.PathOrOverridePath(overrided) == path;
 
-        public static string PathOrOverridePath(this InputBinding inputBinding)
+        public static string PathOrOverridePath(this InputBinding inputBinding, bool overrided)
         {
-            if (string.IsNullOrEmpty(inputBinding.overridePath))
-                return inputBinding.path;
-            else return inputBinding.overridePath;
+            if (overrided)
+            {
+                if (string.IsNullOrEmpty(inputBinding.overridePath))
+                    return inputBinding.path;
+                else return inputBinding.overridePath;
+            }
+            else return inputBinding.path;
         }
 
         public static InputDevice GetDevice() => PlayerInput.GetPlayerByIndex(0).devices[0];
         public static InputDevice GetDevice(int playerIndex) => PlayerInput.GetPlayerByIndex(playerIndex).devices[0];
+
+        public static bool Es2D(this InputAction accio, InputDevice inputDevice, bool overrided)
+        {
+            for (int b = 0; b < accio.bindings.Count; b++)
+            {
+                if (accio.bindings[b].PathOrOverridePath(overrided) == KEY_2DVECTOR)
+                    return true;
+            }
+            return false;
+        }
+        public static bool Es1D(this InputAction accio, InputDevice inputDevice, bool overrided)
+        {
+            for (int b = 0; b < accio.bindings.Count; b++)
+            {
+                if (accio.bindings[b].PathOrOverridePath(overrided) == KEY_1DVECTOR)
+                    return true;
+            }
+            return false;
+        }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         public static Vector3 MouseRayCastFromCamera_Point() => MouseRayCastFromCamera_Point(MyCamera.Main, XS_Layers.Everything);
         public static Vector3 MouseRayCastFromCamera_Point(Camera camera) => MouseRayCastFromCamera_Point(camera, XS_Layers.Everything);
@@ -80,6 +122,20 @@ namespace XS_Utils
                 return null;
             }
         }
+
+
+
+
+
+
+
+        [Serializable]
+        public struct Icone
+        {
+            public Sprite icone;
+            public Sprite fondo;
+        }
+
     }
 
 }
