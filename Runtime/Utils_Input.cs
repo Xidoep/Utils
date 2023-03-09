@@ -30,7 +30,7 @@ namespace XS_Utils
 
         public static void OnPerformedAdd(this InputActionReference inputActionReference, Action<InputAction.CallbackContext> action) => inputActionReference.action.performed += action;
         public static void OnPerformedRemove(this InputActionReference inputActionReference, Action<InputAction.CallbackContext> action) => inputActionReference.action.performed -= action;
-        public static bool ComparePath(this InputBinding inputBinding, string path, bool overrided) => inputBinding.PathOrOverridePath(overrided) == path;
+        public static bool CompararPath(this InputBinding inputBinding, string path, bool overrided) => inputBinding.PathOrOverridePath(overrided) == path;
 
         public static string PathOrOverridePath(this InputBinding inputBinding, bool overrided)
         {
@@ -42,6 +42,7 @@ namespace XS_Utils
             }
             else return inputBinding.path;
         }
+        public static bool IsOverrdided(this InputBinding inputBinding) => string.IsNullOrEmpty(inputBinding.overridePath);
 
         public static InputDevice GetDevice() => PlayerInput.GetPlayerByIndex(0).devices[0];
         public static InputDevice GetDevice(int playerIndex) => PlayerInput.GetPlayerByIndex(playerIndex).devices[0];
@@ -64,6 +65,41 @@ namespace XS_Utils
             }
             return false;
         }
+
+        public static Vector3 Posicio2D_PerIndex(this Transform transform, int i)
+        {
+            switch (i)
+            {
+                case 0:
+                    return transform.up * 9.7f;
+                case 1:
+                    return transform.up * -8.3f;
+                case 2:
+                    return transform.up * -8.3f + transform.right * -18;
+                case 3:
+                    return transform.up * -8.3f + transform.right * 18;
+                default:
+                    return Vector3.zero;
+            }
+        }
+        public static Vector3 Posicio1D_PerIndex(this Transform transform, int i)
+        {
+            switch (i)
+            {
+                case 0:
+                    return transform.up * -1f + transform.right * -15;
+                case 1:
+                    return transform.up * -1f + transform.right * 15;
+                default:
+                    return transform.up * -1f;
+            }
+        }
+
+
+
+
+
+
 
 
 
