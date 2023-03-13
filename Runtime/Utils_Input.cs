@@ -59,7 +59,6 @@ namespace XS_Utils
         }
         public static bool Es1D(this InputAction accio, InputDevice inputDevice, bool overrided)
         {
-            Debug.Log( inputDevice.ToString());
             for (int b = 0; b < accio.bindings.Count; b++)
             {
                 if (accio.bindings[b].PathOrOverridePath(overrided) == KEY_1DVECTOR)
