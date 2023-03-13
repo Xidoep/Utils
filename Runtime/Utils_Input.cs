@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -43,8 +44,18 @@ namespace XS_Utils
             }
             else return inputBinding.path;
         }
-        public static bool IsOverrdided(this InputBinding inputBinding) => string.IsNullOrEmpty(inputBinding.overridePath);
-
+        public static bool IsOverrdided(this InputBinding inputBinding) 
+        {
+            if (string.IsNullOrEmpty(inputBinding.overridePath))
+                return false;
+            else
+            {
+                if (inputBinding.overridePath == inputBinding.path)
+                    return false;
+                else return true;
+            }
+            
+        } 
         public static InputDevice GetDevice() => PlayerInput.GetPlayerByIndex(0).devices[0];
         public static InputDevice GetDevice(int playerIndex) => PlayerInput.GetPlayerByIndex(playerIndex).devices[0];
 
@@ -178,8 +189,12 @@ namespace XS_Utils
         [Serializable]
         public struct Icone
         {
+            public string path;
+            public bool overrided;
             public Sprite icone;
             public Sprite fondo;
+
+            public void SetOverrided(bool overrided) => this.overrided = overrided; 
         }
 
     }
