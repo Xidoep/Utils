@@ -32,6 +32,24 @@ namespace XS_Utils
             }
             return _tmp;
         }
+        public static List<T> LoadAllAssetsAtPathAndSubFolders<T>(string path)
+        {
+            List<T> _tmp = new List<T>();
+            string[] subfolders = AssetDatabase.GetSubFolders(path);
+
+            foreach (var item in XS_Editor.LoadAllAssetsAtPath(path))
+            {
+                _tmp.Add((T)item);
+            }
+            for (int i = 0; i < subfolders.Length; i++)
+            {
+                foreach (var item in XS_Editor.LoadAllAssetsAtPath(subfolders[i]))
+                {
+                    _tmp.Add((T)item);
+                }
+            }
+            return _tmp;
+        }
         public static List<object> LoadAllAssetsAtPath(string folderPath)
         {
 #if UNITY_EDITOR
