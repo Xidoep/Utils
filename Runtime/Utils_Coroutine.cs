@@ -80,6 +80,12 @@ namespace XS_Utils
             waitForSeconds = new WaitForSeconds(time);
             return corrutinaEstaticaMonoBehavior.StartCoroutine(LoopTime_FrameDependant(ending));
         }
+        public static Coroutine StartCoroutine_Ending_FrameDependant<T>(float time, Action<T> ending, T arg)
+        {
+            Init();
+            waitForSeconds = new WaitForSeconds(time);
+            return corrutinaEstaticaMonoBehavior.StartCoroutine(LoopTime_FrameDependant(ending, arg));
+        }
         public static Coroutine StartCoroutine_EndFrame(Action ending)
         {
             Init();
@@ -123,6 +129,11 @@ namespace XS_Utils
         {
             yield return waitForSeconds;
             ending.Invoke();
+        }
+        static IEnumerator LoopTime_FrameDependant<T>(Action<T> ending, T arg)
+        {
+            yield return waitForSeconds;
+            ending.Invoke(arg);
         }
         static IEnumerator LoopEndOfFrame(Action ending)
         {
