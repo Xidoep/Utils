@@ -4,50 +4,52 @@ namespace XS_Utils
 {
     public static class XS_Transform
     {
+        static Transform _t;
         /// <summary>
         /// Setup the transform with given information.
         /// It's useful when you want to position a transform like when you Instantiate it, but you can't do it directly.
         /// </summary>
-        public static Transform SetTransform(this Transform transform, Vector3 localPosition, Quaternion localRotation, Vector3 localScale, Transform parent = null)
+
+        public static Component SetTransform(this Component component, Vector3 localPosition, Vector3 localEulerAngles, Vector3 localScale, Component parent = null)
         {
-            Transform _t = transform;
-            _t.SetParent(parent);
-            _t.localPosition = localPosition;
-            _t.localRotation = localRotation;
-            _t.localScale = localScale;
-            return _t;
-        }
-        public static Transform SetTransform(this Transform transform, Vector3 localPosition, Vector3 localEulerAngles, Vector3 localScale, Transform parent = null)
-        {
-            Transform _t = transform;
-            _t.SetParent(parent);
+            _t = component.transform;
+            _t.SetParent(parent.transform);
             _t.localPosition = localPosition;
             _t.localEulerAngles = localEulerAngles;
             _t.localScale = localScale;
-            return _t;
+            return component;
         }
-        public static Transform SetTransform(this Transform transform, Vector3 localPosition, Quaternion localRotation, Transform parent = null)
+        public static Component SetTransform(this Component component, Vector3 localPosition, Quaternion localRotation, Vector3 localScale, Component parent = null)
         {
-            Transform _t = transform;
-            _t.SetParent(parent);
+            _t = component.transform;
+            _t.SetParent(parent.transform);
             _t.localPosition = localPosition;
             _t.localRotation = localRotation;
-            return _t;
+            _t.localScale = localScale;
+            return component;
         }
-        public static Transform SetTransform(this Transform transform, Vector3 localPosition, Vector3 localEulerAngles, Transform parent = null)
+        public static Component SetTransform(this Component component, Vector3 localPosition, Quaternion localRotation, Component parent = null)
         {
-            Transform _t = transform;
-            _t.SetParent(parent);
+            _t = component.transform;
+            _t.SetParent(parent.transform);
+            _t.localPosition = localPosition;
+            _t.localRotation = localRotation;
+            return component;
+        }
+        public static Component SetTransform(this Component component, Vector3 localPosition, Vector3 localEulerAngles, Component parent = null)
+        {
+            _t = component.transform;
+            _t.SetParent(parent.transform);
             _t.localPosition = localPosition;
             _t.localEulerAngles = localEulerAngles;
-            return _t;
+            return component;
         }
         /// <summary>
         /// Iguala la posicio, rot, escalat d'un transform a un altre.
         /// </summary>
-        public static Transform Equalize(this Transform transform, Transform other)
+        public static Transform Copiar(this Transform transform, Transform other)
         {
-            return transform.SetTransform(other.localPosition, other.localEulerAngles, other.localScale, other.parent);
+            return transform.SetTransform(other.localPosition, other.localEulerAngles, other.localScale, other.parent).transform;
         }
 
 

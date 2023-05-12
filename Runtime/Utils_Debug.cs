@@ -85,7 +85,7 @@ namespace XS_Utils
         {
 #if UNITY_EDITOR
             primitive = GameObject.CreatePrimitive(primitiveType);
-            primitive.transform.SetTransform(position, rotation.eulerAngles, scale, parent);
+            //primitive.transform.SetTransform(position, rotation.eulerAngles, scale, parent);
             if (time > 0) GameObject.Destroy(primitive, time);
 #endif
         }
