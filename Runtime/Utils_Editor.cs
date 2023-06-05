@@ -28,7 +28,8 @@ namespace XS_Utils
             List<T> _tmp = new List<T>();
             foreach (var item in XS_Editor.LoadAllAssetsAtPath(path))
             {
-                _tmp.Add((T)item);
+                if(item is T)
+                    _tmp.Add((T)item);
             }
             return _tmp;
         }
@@ -36,16 +37,34 @@ namespace XS_Utils
         {
             List<T> _tmp = new List<T>();
             string[] subfolders = AssetDatabase.GetSubFolders(path);
+            string[] subsubfolders;
 
             foreach (var item in XS_Editor.LoadAllAssetsAtPath(path))
             {
-                _tmp.Add((T)item);
+                if (item is T)
+                    _tmp.Add((T)item);
             }
+            //Debug.LogError("Aprofunditzar un nivell més si existeix!");
             for (int i = 0; i < subfolders.Length; i++)
             {
                 foreach (var item in XS_Editor.LoadAllAssetsAtPath(subfolders[i]))
                 {
-                    _tmp.Add((T)item);
+                    if (item is T)
+                        _tmp.Add((T)item);
+                }
+
+                subsubfolders = AssetDatabase.GetSubFolders(subfolders[i]);
+
+                if (subsubfolders == null)
+                    continue;
+
+                for (int ss = 0; ss < subsubfolders.Length; ss++)
+                {
+                    foreach (var item in XS_Editor.LoadAllAssetsAtPath(subsubfolders[ss]))
+                    {
+                        if (item is T)
+                            _tmp.Add((T)item);
+                    }
                 }
             }
             return _tmp;
