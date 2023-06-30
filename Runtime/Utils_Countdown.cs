@@ -15,14 +15,16 @@ namespace XS_Utils
         Action onEnd;
         bool active;
         float currentTime;
+        bool frameDependant;
         bool Ended => currentTime <= 0;
 
-        public XS_Countdown(float time, Action onEnd)
+        public XS_Countdown(float time, Action onEnd, bool frameDependant = false)
         {
             active = false;
             SetCurrentTime(time);
             this.time = time;
             this.onEnd = onEnd;
+            this.frameDependant = frameDependant;
         }
 
         /// <summary>
@@ -67,7 +69,8 @@ namespace XS_Utils
             if (!active)
                 return;
 
-            currentTime -= Time.unscaledDeltaTime;
+
+            currentTime -= frameDependant ? Time.deltaTime : Time.unscaledDeltaTime;
 
             if (Ended)
             {
