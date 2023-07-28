@@ -31,7 +31,8 @@ public class ScriptableObject_MostrableDrawer : PropertyDrawer
             if (!editor)
                 Editor.CreateCachedEditor(property.objectReferenceValue, null, ref editor);
 
-            editor.OnInspectorGUI();
+            if (editor)
+                editor.OnInspectorGUI();
 
             EditorGUI.indentLevel--;
         }
