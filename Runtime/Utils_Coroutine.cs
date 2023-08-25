@@ -74,6 +74,12 @@ namespace XS_Utils
             waitForSecondsRealtime = new WaitForSecondsRealtime(time);
             return corrutinaEstaticaMonoBehavior.StartCoroutine(LoopTime(ending));
         }
+        public static Coroutine StartCoroutine_Ending<T>(float time, Action<T> ending, T arg)
+        {
+            Init();
+            waitForSecondsRealtime = new WaitForSecondsRealtime(time);
+            return corrutinaEstaticaMonoBehavior.StartCoroutine(LoopTime_FrameDependant(ending, arg));
+        }
         public static Coroutine StartCoroutine_Ending_FrameDependant(float time, Action ending)
         {
             Init();
