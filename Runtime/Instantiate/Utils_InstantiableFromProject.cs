@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using XS_Utils;
 
 public class Utils_InstantiableFromProject : MonoBehaviour
 {
@@ -16,9 +17,17 @@ public class Utils_InstantiableFromProject : MonoBehaviour
     public void Instantiate(Vector3 position) => InstantiateReturn(position);
     public GameObject InstantiateReturn(Vector3 position) => Instantiate(gameObject, position, Quaternion.identity);
 
+    public void Instantiate(Vector3 position, float delay) 
+    {
+        XS_Coroutine.StartCoroutine_Ending(delay, () => Instantiate(gameObject, position, Quaternion.identity));
+    }
+
     public void Instantiate(Vector3 position, Quaternion rotation) => InstantiateReturn(position, rotation);
     public GameObject InstantiateReturn(Vector3 position, Quaternion rotation) => Instantiate(gameObject, position, rotation);
 
     public void Instantiate(Vector3 position, Quaternion rotation, Transform parent) => InstantiateReturn(position, rotation, parent);
     public GameObject InstantiateReturn(Vector3 position, Quaternion rotation, Transform parent) => Instantiate(gameObject, position, rotation, parent);
+
+
+
 }
