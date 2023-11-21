@@ -41,6 +41,7 @@ public class NotaDrawer : DecoratorDrawer
 }
 
 //LINE
+/*
 [CustomPropertyDrawer(typeof(LiniaAttribute))]
 public class LiniaDrawer : DecoratorDrawer
 {
@@ -63,8 +64,9 @@ public class LiniaDrawer : DecoratorDrawer
         }
     }
 }
-
+*/
 //APARTAT
+/*
 [CustomPropertyDrawer(typeof(ApartatAttribute))]
 public class ApartatDrawer : DecoratorDrawer
 {
@@ -98,7 +100,7 @@ public class ApartatDrawer : DecoratorDrawer
         }
     }
 }
-
+*/
 
 //INFORMACIO
 [CustomPropertyDrawer(typeof(InformacioAttribute))]
