@@ -39,47 +39,51 @@ namespace XS_Utils
         {
             List<T> _tmp = new List<T>();
 #if UNITY_EDITOR
-            string[] subfolders = AssetDatabase.GetSubFolders(path);
-            string[] subsubfolders;
+            string[] subfolders1;
+            string[] subfolders2;
+            string[] subfolders3;
 
-            foreach (var item in XS_Editor.LoadAllAssetsAtPath(path))
+            //nivell 0
+            foreach (var asset in XS_Editor.LoadAllAssetsAtPath(path))
             {
-                if (item is T)
-                    _tmp.Add((T)item);
+                if (asset is T)
+                    _tmp.Add((T)asset);
             }
-            //Debug.LogError("Aprofunditzar un nivell més si existeix!");
-            for (int i = 0; i < subfolders.Length; i++)
+
+            //Nivell1
+            subfolders1 = AssetDatabase.GetSubFolders(path);
+            for (int n1 = 0; n1 < subfolders1.Length; n1++)
             {
-                foreach (var item in XS_Editor.LoadAllAssetsAtPath(subfolders[i]))
+                foreach (var asset in XS_Editor.LoadAllAssetsAtPath(subfolders1[n1]))
                 {
-                    if (item is T)
-                        _tmp.Add((T)item);
+                    if (asset is T)
+                        _tmp.Add((T)asset);
                 }
 
-                subsubfolders = AssetDatabase.GetSubFolders(subfolders[i]);
-
-                if (subsubfolders == null)
+                //Nivell2
+                subfolders2 = AssetDatabase.GetSubFolders(subfolders1[n1]);
+                if (subfolders2 == null)
                     continue;
 
-                for (int ss = 0; ss < subsubfolders.Length; ss++)
+                for (int n2 = 0; n2 < subfolders2.Length; n2++)
                 {
-                    foreach (var item in XS_Editor.LoadAllAssetsAtPath(subsubfolders[ss]))
+                    foreach (var asset in XS_Editor.LoadAllAssetsAtPath(subfolders2[n2]))
                     {
-                        if (item is T)
-                            _tmp.Add((T)item);
+                        if (asset is T)
+                            _tmp.Add((T)asset);
                     }
 
-                    subsubfolders = AssetDatabase.GetSubFolders(subfolders[i]);
-
-                    if (subsubfolders == null)
+                    //NIvell3
+                    subfolders3 = AssetDatabase.GetSubFolders(subfolders2[n2]);
+                    if (subfolders3 == null)
                         continue;
 
-                    for (int sss = 0; sss < subsubfolders.Length; sss++)
+                    for (int n3 = 0; n3 < subfolders3.Length; n3++)
                     {
-                        foreach (var item in XS_Editor.LoadAllAssetsAtPath(subsubfolders[sss]))
+                        foreach (var asset in XS_Editor.LoadAllAssetsAtPath(subfolders3[n3]))
                         {
-                            if (item is T)
-                                _tmp.Add((T)item);
+                            if (asset is T)
+                                _tmp.Add((T)asset);
                         }
                     }
                 }
