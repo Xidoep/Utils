@@ -8,6 +8,7 @@ public class Utils_RuntimeEsdeveniments : MonoBehaviour
     public UnityEvent enAwake;
     public UnityEvent enStart;
     public UnityEvent enUpdate;
+    public UnityEvent enLateUpdate;
     public UnityEvent enPerdreFocus;
     public UnityEvent enQuit;
 
@@ -24,6 +25,10 @@ public class Utils_RuntimeEsdeveniments : MonoBehaviour
     void Update()
     {
         enUpdate.Invoke();
+    }
+    private void LateUpdate()
+    {
+        enLateUpdate.Invoke();
     }
 
     void OnApplicationFocus(bool focus)
