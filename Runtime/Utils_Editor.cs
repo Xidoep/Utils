@@ -10,7 +10,7 @@ namespace XS_Utils
 {
     public static class XS_Editor
     {
-        const string GUARDAT_PATH = "Assets/XidoStudio/Guardat/Runtime/Guardat.asset";
+        const string GUARDAT_PATH = "Assets/XS/Guardat/Runtime/Guardat.asset";
         /// <summary>
         /// This just can be called on Editors function. With the porpouse of fulfilling assets automatically without needing to make editor custom inspectors.
         /// </summary>

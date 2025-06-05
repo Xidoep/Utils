@@ -63,7 +63,7 @@ namespace XS_Utils
             //Debugar.DrawRay(rigidbody.position, rigidbody.transform.GetDirectionToTarget(target.transform), Color.blue);
             Debugar.DrawLine(rigidbody.position, me.ClosestPoint(rigidbody.position), Color.yellow);
             //me.ClosestPoint(transform.position);
-            return Vector3.Dot(rigidbody.transform.GetDirectionAbsolute(me.ClosestPoint(rigidbody.position)), rigidbody.velocity.normalized) > 0.1f;
+            return Vector3.Dot(rigidbody.transform.GetDirectionAbsolute(me.ClosestPoint(rigidbody.position)), rigidbody.linearVelocity.normalized) > 0.1f;
         }
         //public static bool IsAt
 
